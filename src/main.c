@@ -41,6 +41,10 @@ int main(int argc, char *argv[]) {
                 else if (ch == ';') printf("SEMICOLON ; null\n");
                 else if (ch == '*') printf("STAR * null\n");
                 else if (ch == '/') printf("SLASH / null\n");
+                else if (ch == '=') {
+                    if (*(stri+1) == '=') printf("EQUAL_EQUAL == null\n");
+                    else printf("EQUAL = null\n");
+                }
 
                 else if (ch == '\n') line++;
                 else {
