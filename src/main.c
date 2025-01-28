@@ -72,6 +72,85 @@ int main(int argc, char *argv[]) {
                     }
                     else printf("GREATER > null\n");
                 }
+
+                //KEYWORDS
+                else if (strncmp(stri, "and", 3) == 0) {
+                    printf("AND and null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "class", 5) == 0) {
+                    printf("CLASS class null\n");
+                    stri+=5; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "else", 4) == 0) {
+                    printf("ELSE else null\n");
+                    stri+=4; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "false", 5) == 0) {
+                    printf("FALSE false null\n");
+                    stri+=5; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "for", 3) == 0) {
+                    printf("FOR for null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "fun", 3) == 0) {
+                    printf("FUN fun null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "if", 2) == 0) {
+                    printf("IF if null\n");
+                    stri+=2; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "nil", 3) == 0) {
+                    printf("NIL nil null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "or", 2) == 0) {
+                    printf("OR or null\n");
+                    stri+=2; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "return", 6) == 0) {
+                    printf("RETURN return null\n");
+                    stri+=6; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "super", 5) == 0) {
+                    printf("SUPER super null\n");
+                    stri+=5; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "this", 4) == 0) {
+                    printf("THIS this null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "true", 4) == 0) {
+                    printf("TRUE true null\n");
+                    stri+=4; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "var", 3) == 0) {
+                    printf("VAR var null\n");
+                    stri+=3; ch = *stri;
+                    continue;
+                }
+                else if (strncmp(stri, "while", 5) == 0) {
+                    printf("WHILE while null\n");
+                    stri+=5; ch = *stri;
+                    continue;
+                }
+
+                //COMMENTS
                 else if (ch == '/') {
                     if (stri[1] == '/') {
                         char* newline = strchr(stri, '\n');
@@ -84,6 +163,8 @@ int main(int argc, char *argv[]) {
                         printf("SLASH / null\n");
                     }
                 }
+
+                //STRINGS
                 else if (ch == '\"') {
                     char* endstr = strchr(stri+1, '\"');
                     if (endstr == NULL) {
@@ -101,6 +182,8 @@ int main(int argc, char *argv[]) {
                         continue;
                     }
                 }
+
+                //NUMBERS
                 else if (ch >= '0' && ch <= '9') {
                     char* notnum = stri+1;
                     int is_integer = 1;
@@ -129,6 +212,8 @@ int main(int argc, char *argv[]) {
                     continue;
 
                 }
+
+                //IDENFIFIERS
                 else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch =='_') {
                     // tokenize until u find a non-alphanumeric character
                     char* notalphnum = stri+1;
@@ -148,6 +233,8 @@ int main(int argc, char *argv[]) {
 
                 else if (ch == ' ');
                 else if (ch == '\t');
+
+
 
                 else if (ch == '\n') line++;
                 else {
