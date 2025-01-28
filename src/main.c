@@ -57,6 +57,22 @@ int main(int argc, char *argv[]) {
                     }
                     else printf("BANG ! null\n");
                 }
+                else if (ch == '<') {
+                    if (stri[1] == '=') {
+                        printf("LESS_EQUAL <= null\n");
+                        stri+=2; ch = *stri;
+                        continue;
+                    }
+                    else printf("LESS < null\n");
+                }
+                else if (ch == '>') {
+                    if (stri[1] == '=') {
+                        printf("GREATER_EQUAL >= null\n");
+                        stri+=2; ch = *stri;
+                        continue;
+                    }
+                    else printf("GREATER > null\n");
+                }
 
                 else if (ch == '\n') line++;
                 else {
