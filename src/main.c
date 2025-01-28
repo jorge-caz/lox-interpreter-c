@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
                 else if (ch == '.') printf("DOT . null\n");
                 else if (ch == '-') printf("MINUS - null\n");
                 else if (ch == '+') printf("PLUS + null\n");
-                else if (ch == ';') printf("SEMICOMMA ; null\n");
+                else if (ch == ';') printf("SEMICOLON ; null\n");
                 else if (ch == '*') printf("STAR * null\n");
                 else if (ch == '/') printf("SLASH / null\n");
 
