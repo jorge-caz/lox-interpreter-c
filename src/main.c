@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
                     char temp = *notnum; *notnum = '\0';
                     float num = strtof(stri, NULL);
                     if ((int) num == num)
-                    printf("NUMBER %g %g.0\n", num, num);
+                    printf("NUMBER %s %g.0\n", stri, num);
                     else
                     printf("NUMBER %s %.7g\n", stri, num);
                     *notnum = temp;
