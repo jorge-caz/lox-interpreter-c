@@ -84,6 +84,8 @@ int main(int argc, char *argv[]) {
                         printf("SLASH / null\n");
                     }
                 }
+                else if (ch == ' ');
+                else if (ch == '\t');
 
                 else if (ch == '\n') line++;
                 else {
