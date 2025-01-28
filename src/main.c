@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
                 else if (ch == '!') {
                     if (stri[1] == '=') {
                         printf("BANG_EQUAL != null\n");
-                        stri+=1; ch = *stri;
+                        stri+=2; ch = *stri;
                         continue;
                     }
                     else printf("BANG ! null\n");
