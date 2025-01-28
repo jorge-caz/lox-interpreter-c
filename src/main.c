@@ -31,13 +31,13 @@ int main(int argc, char *argv[]) {
                 else if (ch == ')') printf("RIGHT_PAREN ) null\n");
                 else if (ch == '{') printf("LEFT_BRACE { null\n");
                 else if (ch == '}') printf("RIGHT_BRACE } null\n");
-                else if (ch == ',') print("COMMA , null\n");
-                else if (ch == '.') print("DOT . null\n");
-                else if (ch == '-') print("MINUS - null\n");
-                else if (ch == '+') print("PLUS + null\n");
-                else if (ch == ';') print("SEMICOMMA ; null\n");
-                else if (ch == '*') print("STAR * null\n");
-                else if (ch == '/') print("SLASH / null\n");
+                else if (ch == ',') printf("COMMA , null\n");
+                else if (ch == '.') printf("DOT . null\n");
+                else if (ch == '-') printf("MINUS - null\n");
+                else if (ch == '+') printf("PLUS + null\n");
+                else if (ch == ';') printf("SEMICOMMA ; null\n");
+                else if (ch == '*') printf("STAR * null\n");
+                else if (ch == '/') printf("SLASH / null\n");
 
                 stri++;
                 ch = *stri;
