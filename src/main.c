@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
         }
         
         free(file_contents);
-        free(tokens);
     } else {
         fprintf(stderr, "Unknown command: %s\n", command);
         return 1;
