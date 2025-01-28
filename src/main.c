@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         
         free(file_contents);
     }
-    else if (strcmp(command, "tokenize" == 0)) {
+    else if (strcmp(command, "tokenize") == 0) {
         if (strlen(file_contents) > 0) {
             tokenize(file_contents, &error);
         }
