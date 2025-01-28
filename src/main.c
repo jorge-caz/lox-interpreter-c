@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else if (ch == '\"') {
-                    char* endstr = strchr(stri+1, "\"");
+                    char* endstr = strchr(stri+1, '\"');
                     if (endstr == NULL) {
                         ; //this shouldn't happen
                     }
