@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
                 if (ch == '(') printf("LEFT_PAREN ( null\n");
                 else if (ch == ')') printf("RIGHT_PAREN ) null\n");
                 else if (ch == '{') printf("LEFT_BRACE { null\n");
-                else if (ch == '}') printf("RIGHT_BRACE } null \n");
+                else if (ch == '}') printf("RIGHT_BRACE } null\n");
 
                 stri++;
                 ch = *stri;
