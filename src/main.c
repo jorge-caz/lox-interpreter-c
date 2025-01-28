@@ -84,6 +84,19 @@ int main(int argc, char *argv[]) {
                         printf("SLASH / null\n");
                     }
                 }
+                else if (ch == '\"') {
+                    char* endstr = strchr(stri+1, "\"");
+                    if (endstr == NULL) {
+                        ; //this shouldn't happen
+                    }
+                    else {
+                        stri = strtok(stri+1, "\""); //may need to handle the line calculation
+                        printf("STRING \"%s\" %s", stri, stri);
+                        stri = endstr+1; ch = *stri;
+                        continue;
+                    }
+                }
+
                 else if (ch == ' ');
                 else if (ch == '\t');
 
