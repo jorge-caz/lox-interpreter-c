@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
                 else if (ch == '{') printf("LEFT_BRACE { null\n");
                 else if (ch == '}') printf("RIGHT_BRACE } null\n");
                 else if (ch == ',') printf("COMMA , null\n");
+                else if (ch == '.') printf("DOT . null\n");
                 else if (ch == '-') printf("MINUS - null\n");
                 else if (ch == '+') printf("PLUS + null\n");
                 else if (ch == ';') printf("SEMICOLON ; null\n");
@@ -113,7 +114,11 @@ int main(int argc, char *argv[]) {
                         
                         else break;
                     }
-                    char temp = *notnum; *notnum = '\0';
+                    char temp = *notnum; *notnum = '\0'; 
+                    // may need to handle update of the "line" variable
+                    // may code a helper function that counts the number of '\n'
+                    // instances between two pointers in the same contiguous
+                    // string region. Avoid code repetition and bugs
                     float num = strtof(stri, NULL);
                     if ((int) num == num)
                     printf("NUMBER %s %g.0\n", stri, num);
@@ -124,7 +129,21 @@ int main(int argc, char *argv[]) {
                     continue;
 
                 }
-                else if (ch == '.') printf("DOT . null\n");
+                else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch =='_') {
+                    // tokenize until u find a non-alphanumeric character
+                    char* notalphnum = stri+1;
+                    while ((*notalphnum >= 'a' && *notalphnum <= 'z') || 
+                        (*notalphnum >= 'A' && *notalphnum <= 'Z') || *notalphnum =='_' ||
+                        (*notalphnum >= '0' && *notalphnum <= '9')) {
+                            notalphnum++;
+                    }
+                    char temp = *notalphnum; *notalphnum = '\0';
+                    printf("IDENTIFIER %s null\n", stri);
+                    *notalphnum = temp;
+                    stri = notalphnum; ch = *stri;
+                    continue;
+                }
+                
 
 
                 else if (ch == ' ');
