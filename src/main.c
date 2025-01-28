@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
             while (ch != '\0') {
                 if (ch == '(') printf("LEFT_PAREN ( null\n");
                 else if (ch == ')') printf("RIGHT_PAREN ) null\n");
-                else if (ch == '{') printf("LEFT_BRASE { null\n");
-                else if (ch == '}') printf("RIGHT_PAREN } null \n");
+                else if (ch == '{') printf("LEFT_BRACE { null\n");
+                else if (ch == '}') printf("RIGHT_BRACE } null \n");
 
                 stri++;
                 ch = *stri;
