@@ -102,20 +102,15 @@ int main(int argc, char *argv[]) {
                 }
                 else if (ch >= '0' && ch <= '9') {
                     char* notnum = stri+1;
-                    int is_integer = 1;
                     while ((*notnum >= '0' && *notnum <= '9') || *notnum == '.') {
                         if (!(*notnum == '.' 
-                            && (!(notnum[1] >= '0' && notnum[1] <= '9') || notnum[1] == '.'))) {
-                                notnum++;
-                                if (*notnum == '.') is_integer = 0;
-                            }
+                            && (!(notnum[1] >= '0' && notnum[1] <= '9') || notnum[1] == '.')))
+                        notnum++;
                         else break;
                     }
                     char temp = *notnum; *notnum = '\0';
-                    //float num = strtof(stri, NULL);
-                    if (is_integer) 
-                    printf("NUMBER %s %s.0\n", stri, stri);
-                    else printf("NUMBER %s %s\n", stri, stri);
+                    float num = strtof(stri, NULL);
+                    printf("NUMBER %s %g", stri, num);
                     *notnum = temp;
                     stri = notnum; ch = *stri;
                     continue;
