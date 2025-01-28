@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
         if (strlen(file_contents) > 0) {
             char* stri = file_contents;
             char ch = *stri;
+            int line = 1;
             while (ch != '\0') {
                 if (ch == '(') printf("LEFT_PAREN ( null\n");
                 else if (ch == ')') printf("RIGHT_PAREN ) null\n");
@@ -39,6 +40,8 @@ int main(int argc, char *argv[]) {
                 else if (ch == '*') printf("STAR * null\n");
                 else if (ch == '/') printf("SLASH / null\n");
 
+                else if (ch == '\n') line++;
+                else printf("[line %d] Error: Unexpected character: %c", line, ch);
                 stri++;
                 ch = *stri;
             }
