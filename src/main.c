@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
                 else if (ch == '{') printf("LEFT_BRACE { null\n");
                 else if (ch == '}') printf("RIGHT_BRACE } null\n");
                 else if (ch == ',') printf("COMMA , null\n");
-                else if (ch == '.') printf("DOT . null\n");
                 else if (ch == '-') printf("MINUS - null\n");
                 else if (ch == '+') printf("PLUS + null\n");
                 else if (ch == ';') printf("SEMICOLON ; null\n");
@@ -92,12 +91,33 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                     else {
-                        stri = strtok(stri+1, "\""); //may need to handle the line calculation
+                        stri = strtok(stri+1, "\""); 
+                        // may need to handle the line calculation
+                        // idea to fix this: do a while loop from the first " 
+                        // to the second " count instances of \n
                         printf("STRING \"%s\" %s\n", stri, stri);
                         stri = endstr+1; ch = *stri;
                         continue;
                     }
                 }
+                else if (ch >= '0' && ch <= '9') {
+                    char* notnum = stri+1;
+                    while ((*notnum >= '0' && *notnum <= '9') || *notnum == '.') {
+                        if (!(*notnum == '.' 
+                            && (!(notnum[1] >= '0' && notnum[1] <= '9') || notnum[1] == '.')))
+                        notnum++;
+                        else break;
+                    }
+                    char temp = *notnum; *notnum = '\0';
+                    float num = strtof(stri, NULL);
+                    printf("NUMBER %s %f", stri, num);
+                    *notnum = temp;
+                    stri = notnum; ch = *stri;
+                    continue;
+
+                }
+                else if (ch == '.') printf("DOT . null\n");
+
 
                 else if (ch == ' ');
                 else if (ch == '\t');
