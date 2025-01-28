@@ -469,4 +469,5 @@ void tokenize(char* input, int* error) {
         }
         stri++; ch = *stri;
     }
+    printf("EOF  null\n");
 } 
