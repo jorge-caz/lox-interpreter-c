@@ -42,7 +42,10 @@ int main(int argc, char *argv[]) {
                 else if (ch == '*') printf("STAR * null\n");
                 else if (ch == '/') printf("SLASH / null\n");
                 else if (ch == '=') {
-                    if (*(stri+1) == '=') printf("EQUAL_EQUAL == null\n");
+                    if (*(stri+1) == '=') { 
+                        printf("EQUAL_EQUAL == null\n");
+                        stri+=2; ch = *stri;
+                    }
                     else printf("EQUAL = null\n");
                 }
 
@@ -51,8 +54,7 @@ int main(int argc, char *argv[]) {
                     fprintf(stderr, "[line %d] Error: Unexpected character: %c\n", line, ch);
                     error = 1;
                 }
-                stri++;
-                ch = *stri;
+                stri++; ch = *stri;
             }
         } 
         printf("EOF  null\n"); // Placeholder, remove this line when implementing the scanner
