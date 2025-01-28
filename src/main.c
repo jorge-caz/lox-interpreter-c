@@ -87,7 +87,9 @@ int main(int argc, char *argv[]) {
                 else if (ch == '\"') {
                     char* endstr = strchr(stri+1, '\"');
                     if (endstr == NULL) {
-                        ; //this shouldn't happen
+                        fprintf(stderr, "[line %d] Error: Unterminated string.\n", line);
+                        error = 1;
+                        break;
                     }
                     else {
                         stri = strtok(stri+1, "\""); //may need to handle the line calculation
