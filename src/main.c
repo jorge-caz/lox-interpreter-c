@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    int error = 0;
     const char *command = argv[1];
 
     if (strcmp(command, "tokenize") == 0) {
@@ -27,6 +28,7 @@ int main(int argc, char *argv[]) {
             char* stri = file_contents;
             char ch = *stri;
             int line = 1;
+            
             while (ch != '\0') {
                 if (ch == '(') printf("LEFT_PAREN ( null\n");
                 else if (ch == ')') printf("RIGHT_PAREN ) null\n");
@@ -43,8 +45,7 @@ int main(int argc, char *argv[]) {
                 else if (ch == '\n') line++;
                 else {
                     fprintf(stderr, "[line %d] Error: Unexpected character: %c\n", line, ch);
-                    fprintf(stdout, "EOF  null\n");
-                    exit(65);
+                    error = 1;
                 }
                 stri++;
                 ch = *stri;
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    exit(error ? 65: 0);
     return 0;
 }
 
