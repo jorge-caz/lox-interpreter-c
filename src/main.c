@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
             Token token = *tokens;
-            while (token.type != EOF) {
+            while (token.type != TYPE_EOF) {
                 printf("%s", token.lexeme);
 
                 tokens++; token = *tokens;

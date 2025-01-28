@@ -40,7 +40,7 @@ typedef enum {
     VAR,
     WHILE,
     SLASH,
-    EOF,
+    TYPE_EOF,
     ERROR
 } TokenType;
 

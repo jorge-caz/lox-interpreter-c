@@ -1,7 +1,7 @@
-#include "scanner.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "scanner.h"
 
 Token create_token(TokenType type, const char* lexeme, int line) {
     Token token;
@@ -240,7 +240,7 @@ Token* scan_tokens(char* input, int* error) {
         }
         stri++; ch = *stri; n++;
     }
-    tokens[n] = create_token(EOF, "", line);
+    tokens[n] = create_token(TYPE_EOF, "", line);
     return tokens;
 }
 
