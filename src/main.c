@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
                 else if (ch == '\n') line++;
                 else {
                     fprintf(stderr, "[line %d] Error: Unexpected character: %c\n", line, ch);
-                    printf("EOF  null\n");
+                    //printf("EOF  null\n");
                     exit(65);
                 }
                 stri++;
