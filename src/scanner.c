@@ -202,8 +202,15 @@ Token* scan_tokens(char* input, int* error) {
             // may code a helper function that counts the number of '\n'
             // instances between two pointers in the same contiguous
             // string region. Avoid code repetition and bugs
-
+            float num = strtof(stri, NULL);
+            if ((int) num == num) { 
+                char* newStri = (char* ) malloc(strlen(stri) + 3);
+                sprintf(newStri, "%s.0", stri);
+                tokens[n] = create_token(NUMBER, newStri, line);
+            }
+            else
             tokens[n] = create_token(NUMBER, strdup(stri), line);
+            
             *notnum = temp;
             stri = notnum; ch = *stri; n++;
             continue;
