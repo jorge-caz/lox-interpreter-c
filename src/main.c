@@ -119,6 +119,11 @@ int main(int argc, char *argv[]) {
                     stri+=2; ch = *stri;
                     continue;
                 }
+                else if (strncmp(stri, "print", 5) == 0) {
+                    printf("PRINT print null\n");
+                    stri+=5; ch = *stri;
+                    continue;
+                }
                 else if (strncmp(stri, "return", 6) == 0) {
                     printf("RETURN return null\n");
                     stri+=6; ch = *stri;
