@@ -18,13 +18,11 @@ int main(int argc, char *argv[]) {
     int error = 0;
     Token* tokens;
     const char *command = argv[1];
+    char* file_contents = read_file_contents(argv[2]);
 
     if (strcmp(command, "parse") == 0) {
         fprintf(stderr, "Logs from your program will appear here!\n");
-        
-        char* file_contents = read_file_contents(argv[2]);
 
-        // Uncomment this block to pass the first stage
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
             Token token = *tokens;
@@ -36,7 +34,13 @@ int main(int argc, char *argv[]) {
         }
         
         free(file_contents);
-    } else {
+    }
+    else if (strcmp(command, "tokenize" == 0)) {
+        if (strlen(file_contents) > 0) {
+            tokenize(file_contents, &error);
+        }
+    }
+    else {
         fprintf(stderr, "Unknown command: %s\n", command);
         return 1;
     }

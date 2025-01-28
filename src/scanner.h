@@ -52,5 +52,6 @@ typedef struct {
 
 Token create_token(TokenType type, const char* lexeme, int line);
 Token* scan_tokens(char* input, int* error);
+void tokenize(char* input, int* error);
 
 #endif
