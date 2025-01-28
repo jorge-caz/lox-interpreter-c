@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 char *read_file_contents(const char *filename);
 
@@ -103,15 +102,20 @@ int main(int argc, char *argv[]) {
                 }
                 else if (ch >= '0' && ch <= '9') {
                     char* notnum = stri+1;
+                    int is_integer = 1;
                     while ((*notnum >= '0' && *notnum <= '9') || *notnum == '.') {
                         if (!(*notnum == '.' 
                             && (!(notnum[1] >= '0' && notnum[1] <= '9') || notnum[1] == '.')))
-                        notnum++;
+                            {
+                                notnum++;
+                                if (*notnum == '.') is_integer = 0;
+                        }
+                        
                         else break;
                     }
                     char temp = *notnum; *notnum = '\0';
                     float num = strtof(stri, NULL);
-                    if (floor(num) == num)
+                    if (is_integer)
                     printf("NUMBER %s %s.0", stri, stri);
                     else
                     printf("NUMBER %s %.7g\n", stri, num);
