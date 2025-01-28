@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
                 }
                 else if (strncmp(stri, "this", 4) == 0) {
                     printf("THIS this null\n");
-                    stri+=3; ch = *stri;
+                    stri+=4; ch = *stri;
                     continue;
                 }
                 else if (strncmp(stri, "true", 4) == 0) {
