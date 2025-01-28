@@ -75,14 +75,16 @@ int main(int argc, char *argv[]) {
                 }
                 else if (ch == '/') {
                     if (stri[1] == '/') {
-                        fprintf(stderr, "This ran!");
                         char* newline = strchr(stri, '\n');
                         if (newline != NULL) newline++;
                         else break;
                         stri = newline; ch = *stri;
                         continue;
                     }
-                    else printf("SLASH / null\n");
+                    else {
+                        printf("%c", stri[1]);
+                        printf("SLASH / null\n");
+                    }
                 }
 
                 else if (ch == '\n') line++;
