@@ -41,7 +41,10 @@ int main(int argc, char *argv[]) {
                 else if (ch == '/') printf("SLASH / null\n");
 
                 else if (ch == '\n') line++;
-                else printf("[line %d] Error: Unexpected character: %c", line, ch);
+                else {
+                    printf("[line %d] Error: Unexpected character: %c", line, ch);
+                    exit(65);
+                }
                 stri++;
                 ch = *stri;
             }
