@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
                 }
                 else if (ch == '/') {
                     if (stri[1] == '/') {
+                        printf("This ran!");
                         char* newline = strchr(stri, '\n');
                         if (newline != NULL) newline++;
                         else break;
