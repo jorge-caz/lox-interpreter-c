@@ -205,12 +205,12 @@ Token* scan_tokens(char* input, int* error) {
             float num = strtof(stri, NULL);
             if ((int) num == num) { 
                 char* newStri = (char* ) malloc(strlen(stri) + 3);
-                sprintf(newStri, "%s.0", stri);
+                sprintf(newStri, "%g.0", num);
                 tokens[n] = create_token(NUMBER, newStri, line);
             }
             else
             tokens[n] = create_token(NUMBER, strdup(stri), line);
-            
+
             *notnum = temp;
             stri = notnum; ch = *stri; n++;
             continue;
