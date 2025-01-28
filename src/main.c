@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     else if (strcmp(command, "tokenize") == 0) {
         if (strlen(file_contents) > 0) {
             tokenize(file_contents, &error);
+            printf("EOF  null\n");
         }
     }
     else {
