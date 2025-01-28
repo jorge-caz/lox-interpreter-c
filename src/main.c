@@ -24,8 +24,14 @@ int main(int argc, char *argv[]) {
 
         // Uncomment this block to pass the first stage
         if (strlen(file_contents) > 0) {
-            fprintf(stderr, "Scanner not implemented\n");
-            exit(1);
+            char* stri = file_contents;
+            char ch = &stri;
+            while (ch != '\0') {
+                if (ch == '(') printf("LEFT_PAREN ( null\n");
+                else if (ch == ')') printf("RIGHT_PAREN ) null\n");
+                stri++;
+                ch = &stri;
+            }
         } 
         printf("EOF  null\n"); // Placeholder, remove this line when implementing the scanner
         
