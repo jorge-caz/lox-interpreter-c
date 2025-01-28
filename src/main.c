@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
                         continue;
                     }
                     else {
-                        printf("SLASH / null\n");
+                        printf("SLASH /afasfafa null\n");
                     }
                 }
 
