@@ -114,8 +114,8 @@ int main(int argc, char *argv[]) {
                     char temp = *notnum; *notnum = '\0';
                     //float num = strtof(stri, NULL);
                     if (is_integer) 
-                    printf("NUMBER %s.0 %s", stri, stri);
-                    else printf("NUMBER %s %s", stri, stri);
+                    printf("NUMBER %s.0 %s\n", stri, stri);
+                    else printf("NUMBER %s %s\n", stri, stri);
                     *notnum = temp;
                     stri = notnum; ch = *stri;
                     continue;
