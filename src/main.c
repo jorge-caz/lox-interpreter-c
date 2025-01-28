@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
                     }
                     else {
                         stri = strtok(stri+1, "\""); //may need to handle the line calculation
-                        printf("STRING \"%s\" %s", stri, stri);
+                        printf("STRING \"%s\" %s\n", stri, stri);
                         stri = endstr+1; ch = *stri;
                         continue;
                     }
