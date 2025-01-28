@@ -42,12 +42,20 @@ int main(int argc, char *argv[]) {
                 else if (ch == '*') printf("STAR * null\n");
                 else if (ch == '/') printf("SLASH / null\n");
                 else if (ch == '=') {
-                    if (*(stri+1) == '=') { 
+                    if (stri[1] == '=') { 
                         printf("EQUAL_EQUAL == null\n");
                         stri+=2; ch = *stri;
                         continue;
                     }
                     else printf("EQUAL = null\n");
+                }
+                else if (ch == '!') {
+                    if (stri[1] == '=') {
+                        printf("BANG_EQUAL != null\n");
+                        stri+=1; ch = *stri;
+                        continue;
+                    }
+                    else printf("BANG ! null\n");
                 }
 
                 else if (ch == '\n') line++;
