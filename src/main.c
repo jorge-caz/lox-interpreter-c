@@ -73,6 +73,15 @@ int main(int argc, char *argv[]) {
                     }
                     else printf("GREATER > null\n");
                 }
+                else if (ch == '/') {
+                    if (stri[1] == '/') {
+                        char* newline = strchr(stri, '\n');
+                        if (newline != NULL) newline++;
+                        else break;
+                        stri = newline;
+                    }
+                    else printf("SLASH / null\n");
+                }
 
                 else if (ch == '\n') line++;
                 else {
