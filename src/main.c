@@ -110,6 +110,9 @@ int main(int argc, char *argv[]) {
                     }
                     char temp = *notnum; *notnum = '\0';
                     float num = strtof(stri, NULL);
+                    if (floor(num) == num)
+                    printf("NUMBER %s %s.0", stri, stri);
+                    else
                     printf("NUMBER %s %.7g\n", stri, num);
                     *notnum = temp;
                     stri = notnum; ch = *stri;
