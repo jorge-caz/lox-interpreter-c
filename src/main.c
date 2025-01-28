@@ -40,7 +40,6 @@ int main(int argc, char *argv[]) {
                 else if (ch == '+') printf("PLUS + null\n");
                 else if (ch == ';') printf("SEMICOLON ; null\n");
                 else if (ch == '*') printf("STAR * null\n");
-                else if (ch == '/') printf("SLASH / null\n");
                 else if (ch == '=') {
                     if (stri[1] == '=') { 
                         printf("EQUAL_EQUAL == null\n");
@@ -75,14 +74,14 @@ int main(int argc, char *argv[]) {
                 }
                 else if (ch == '/') {
                     if (stri[1] == '/') {
-                        char* newline = strchr(stri, '\n')
+                        char* newline = strchr(stri, '\n');
                         if (newline != NULL) newline++;
                         else break;
                         stri = newline; ch = *stri;
                         continue;
                     }
                     else {
-                        printf("SLAsdfsdSH /afasfafa null\n");
+                        printf("SLASH / null\n");
                     }
                 }
 
