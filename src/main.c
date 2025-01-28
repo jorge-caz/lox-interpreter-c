@@ -78,7 +78,8 @@ int main(int argc, char *argv[]) {
                         char* newline = strchr(stri, '\n');
                         if (newline != NULL) newline++;
                         else break;
-                        stri = newline;
+                        stri = newline; ch = *stri;
+                        continue;
                     }
                     else printf("SLASH / null\n");
                 }
