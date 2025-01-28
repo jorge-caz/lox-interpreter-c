@@ -175,9 +175,7 @@ Token* scan_tokens(char* input, int* error) {
                 // may need to handle the line calculation
                 // idea to fix this: do a while loop from the first " 
                 // to the second " count instances of \n
-                char* newStri = (char* ) malloc(strlen(stri) + 3);
-                sprintf(newStri, "\"%s\"", stri);
-                tokens[n] = create_token(STRING, newStri, line);
+                tokens[n] = create_token(STRING, strdup(stri), line);
                 stri = endstr+1; ch = *stri; n++;
                 continue;
             }
