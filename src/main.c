@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
                         char* newline = strchr(stri, '\n');
                         if (newline != NULL) newline++;
                         else break;
-                        stri = newline; ch = *stri;
+                        stri = newline; ch = *stri; line++;
                         continue;
                     }
                     else {
