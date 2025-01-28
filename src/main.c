@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
                     if (*(stri+1) == '=') { 
                         printf("EQUAL_EQUAL == null\n");
                         stri+=2; ch = *stri;
+                        continue;
                     }
                     else printf("EQUAL = null\n");
                 }
