@@ -63,6 +63,7 @@ void run(char* input, int* error) {
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
             printf("%s", to_print.display);
+            exit(0);
         }
         current_tokens = next();
         einitialize(&current_tokens, error, &curr);
