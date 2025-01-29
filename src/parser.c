@@ -135,7 +135,7 @@ char* primary() {
             *err = 1;
             free(exp);
             fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-            return "";
+            exit(65);
         }
 
         free(exp);
@@ -144,6 +144,7 @@ char* primary() {
     else {
         *err = 1;
         fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
+        exit(65);
     }
     return "";
 }
