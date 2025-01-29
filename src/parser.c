@@ -131,7 +131,12 @@ char* primary() {
         char* value = (char* ) malloc(strlen(exp) + 9);
         if (match(RIGHT_PAREN))
         sprintf(value, "(group %s)", exp);
-        else; //must produce syntax error
+        else {
+            *err = 1;
+            free(exp);
+            fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
+            return "";
+        }
 
         free(exp);
         return value;
