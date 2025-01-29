@@ -142,13 +142,9 @@ Expr efactor() {
 Expr eunary() {
     if (ematch(BANG)) {
         Expr exp = eunary();
-        if (exp.type == FALSE) return create_expr("true", TRUE);
-        else if (exp.type == TRUE) return create_expr("false", FALSE);
-        else if (exp.type == NUMBER) {
-            if (exp.display == "0.0" || exp.display == "0") return create_expr("true", TRUE);
-            return create_expr("false", FALSE);
-        }
-        // must have type error
+        if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE);
+        return create_expr("false", FALSE);
+
     }
     if (ematch(MINUS)) {
         Expr exp = eunary();
