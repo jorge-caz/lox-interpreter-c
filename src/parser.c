@@ -19,6 +19,7 @@ Token* advance() {
     return peek();
 }
 Token* previous() {
+    if (current == 0) return peek();
     return &tokenList[current-1];
 }
 
