@@ -176,7 +176,6 @@ Expr eunary() {
 Expr eprimary() {
     if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
         ematch(NIL)) {
-            fprintf(stderr, "\nfor debugging: lexeme is %s\n", eprevious()->lexeme);
             return create_expr(eprevious()->lexeme,eprevious()->type,eprevious()->line);
         }
     else if (ematch(NUMBER)) {
@@ -195,7 +194,7 @@ Expr eprimary() {
         }
     } 
     else {
-        fprintf(stderr, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        fprintf(stderr, "[line %d] Error at '%s': Expect expression but got %s", epeek()->line, epeek()->lexeme, epeek()->type);
         exit(65);
     }
 }
