@@ -19,6 +19,7 @@ int line = 1;
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
     char ch = *stri;
+    n = 0;
     
     const int size = strlen(input);
     Token *tokens = (Token*) malloc(size * sizeof(Token));
