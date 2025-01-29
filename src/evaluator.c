@@ -61,7 +61,7 @@ Expr eequality() {
         }
         else if (last.type == NUMBER && other.type == NUMBER) {
             float expNumber = strtof(last.display, NULL);
-            float otherNumber = strof(other.display, NULL);
+            float otherNumber = strtof(other.display, NULL);
             val = expNumber == otherNumber;
         }
         else if (last.type == STRING && other.type == STRING) {
@@ -85,7 +85,7 @@ Expr ecomparison() {
         if (last.type != NUMBER || other.type != NUMBER); // type error
         if (exp.type == FALSE) continue;
         float expNumber = strtof(last.display, NULL);
-        float otherNumber = strof(other.display, NULL);
+        float otherNumber = strtof(other.display, NULL);
         last = other;
         
         int val;
@@ -106,7 +106,7 @@ Expr eterm() {
         Expr other = efactor();
         if (exp.type == NUMBER && other.type == NUMBER) {
             float expNumber = strtof(exp.display, NULL);
-            float otherNumber = strof(other.display, NULL);
+            float otherNumber = strtof(other.display, NULL);
             char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
             if (operation.type == MINUS) sprintf(newDisplay, "%.7g", expNumber-otherNumber);
             else if (operation.type == PLUS) sprintf(newDisplay, "%.7g", expNumber+otherNumber);
@@ -129,7 +129,7 @@ Expr efactor() {
         Expr other = eunary();
         if (exp.type != NUMBER || other.type != NUMBER); // type error
         float expNumber = strtof(exp.display, NULL);
-        float otherNumber = strof(other.display, NULL);
+        float otherNumber = strtof(other.display, NULL);
         char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
         if (operation.type == STAR) sprintf(newDisplay, "%.7g", expNumber*otherNumber);
         else if (operation.type == SLASH) sprintf(newDisplay, "%.7g", expNumber/otherNumber);
