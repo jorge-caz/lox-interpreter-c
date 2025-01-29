@@ -6,10 +6,10 @@
 
 Token* etokenList;
 int ecurrent = 0;
-int* err;
+int* eerr;
 
 void einitialize(Token** tokens, int* error) {
-    etokenList = *tokens; err = error;
+    etokenList = *tokens; eerr = error;
 }
 
 Expr create_expr(const char* display, TokenType type) {
