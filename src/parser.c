@@ -89,8 +89,7 @@ char* term() {
 char* factor() {
     char* exp = unary();
     printf("\nwe get an exp of %s\n", exp);
-    printf("and the token is %s\n", tokenList[current+1].lexeme);
-    printf("the value of current is %d\n", current);
+    printf("tokens: %s %s %s %s\n", tokenList[0].lexeme, tokenList[1].lexeme, tokenList[2].lexeme, tokenList[3].lexeme);
     while (match(STAR) || match(SLASH)) {
         char* other = unary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
