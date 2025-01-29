@@ -36,7 +36,6 @@ int match(TokenType type) {
 
 // expression -> equality
 void expression() {
-    printf("it runs");
     equality();
 }
 
@@ -85,10 +84,10 @@ void unary() {
 void primary() {
     if (match(NUMBER) || match(STRING) || match(TRUE) || match(FALSE) ||
         match(NIL)) printf("%s", previous()->lexeme);
-    else if (match(LEFT_BRACE)) {
+    else if (match(LEFT_PAREN)) {
         printf("(group ");
         expression();
-        match(RIGHT_BRACE);
+        match(RIGHT_PAREN);
         printf(")");
     } 
 }
