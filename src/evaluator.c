@@ -24,12 +24,12 @@ Token* epeek() {
     return &etokenList[*ecurrent];
 }
 Token* eadvance() {
-    if (!eis_at_end()) *ecurrent++;
+    if (!eis_at_end()) (*ecurrent)++;
     return epeek();
 }
 Token* eprevious() {
     if (*ecurrent == 0) return epeek();
-    return &etokenList[*ecurrent-1];
+    return &etokenList[(*ecurrent)-1];
 }
 
 int eis_at_end() {
