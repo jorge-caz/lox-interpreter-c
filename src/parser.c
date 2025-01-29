@@ -44,9 +44,10 @@ char* expression() {
 char* equality() {
     char* exp = comparison();
     while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
+        Token operation = *peek();
         char* other = comparison();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 7);
-        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+        sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
         free(exp);
         free(other);
@@ -60,9 +61,10 @@ char* comparison() {
     char* exp = term();
     while (match(GREATER) || match(GREATER_EQUAL) ||
             match(LESS) || match(LESS_EQUAL)) {
+        Token operation = *peek();
         char* other = term();
-        char* val = (char* ) malloc(strlen(exp) + strlen(other) + strlen(previous()->lexeme) + 5);
-        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+        char* val = (char* ) malloc(strlen(exp) + strlen(other) + strlen(operation.lexeme) + 5);
+        sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
         free(exp);
         free(other);
@@ -75,9 +77,10 @@ char* comparison() {
 char* term() {
     char* exp = factor();
     while (match(MINUS) || match(PLUS)) {
+        Token operation = *peek();
         char* other = factor();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
-        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+        sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
         free(exp);
         free(other);
@@ -89,13 +92,11 @@ char* term() {
 // factor -> unary (("*" | "/") unary)*
 char* factor() {
     char* exp = unary();
-    printf("tokens: %s %s %s %s", tokenList[0].lexeme, tokenList[1].lexeme, tokenList[2].lexeme, tokenList[3].lexeme);
-    printf("\nwe get an exp of %s\n", exp);
-    printf("current is %d\n", current);
     while (match(STAR) || match(SLASH)) {
+        Token operation = *peek();
         char* other = unary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
-        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+        sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
         free(exp);
         free(other);
@@ -107,9 +108,10 @@ char* factor() {
 // unary -> ("!" | "-") unary | primary
 char* unary() {
     if (match(BANG) || match(MINUS)) {
+        Token operation = *peek();
         char* exp = unary();
         char* value = (char* ) malloc(strlen(exp) + 4);
-        sprintf(value, "(%s %s)", previous()->lexeme, exp);
+        sprintf(value, "(%s %s)", operation.lexeme, exp);
         
         free(exp);
         return value;
