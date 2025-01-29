@@ -26,8 +26,10 @@ int main(int argc, char *argv[]) {
 
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
-            initialize(&tokens);
-            printf("%s", expression());
+            initialize(&tokens, &error);
+            char* exp = expression();
+            if (!error)
+            printf("%s", exp);
         }
         
         free(file_contents);

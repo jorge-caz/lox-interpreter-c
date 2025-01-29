@@ -6,9 +6,10 @@
 
 Token* tokenList;
 int current = 0;
+int* err;
 
-void initialize(Token** tokens) {
-    tokenList = *tokens;
+void initialize(Token** tokens, int* error) {
+    tokenList = *tokens; err = error;
 }
 
 Token* peek() {
@@ -135,6 +136,10 @@ char* primary() {
         free(exp);
         return value;
     } 
-    else; //syntax error
+    else {
+        *err = 1;
+        fprinf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
+    }
+    return "";
 }
 
