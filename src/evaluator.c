@@ -12,7 +12,7 @@ void initialize(Token** tokens, int* error) {
     etokenList = *tokens; err = error;
 }
 
-Expr create_expr(char* display, TokenType type) {
+Expr create_expr(const char* display, TokenType type) {
     Expr expr;
     expr.display = display;
     expr.type = type;

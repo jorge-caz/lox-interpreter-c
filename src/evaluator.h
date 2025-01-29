@@ -21,6 +21,6 @@ Expr eterm();
 Expr efactor();
 Expr eunary();
 Expr eprimary();
-Expr create_expr(char* display, TokenType type);
+Expr create_expr(const char* display, TokenType type);
 
 #endif
