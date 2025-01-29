@@ -5,6 +5,7 @@
 typedef struct {
     char* display;
     TokenType type;
+    int line;
 } Expr;
 
 void einitialize(Token** tokens, int* error);
@@ -21,6 +22,6 @@ Expr eterm();
 Expr efactor();
 Expr eunary();
 Expr eprimary();
-Expr create_expr(const char* display, TokenType type);
+Expr create_expr(const char* display, TokenType type, int line);
 
 #endif

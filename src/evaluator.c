@@ -12,10 +12,11 @@ void einitialize(Token** tokens, int* error) {
     etokenList = *tokens; eerr = error;
 }
 
-Expr create_expr(const char* display, TokenType type) {
+Expr create_expr(const char* display, TokenType type, int line) {
     Expr expr;
     expr.display = display;
     expr.type = type;
+    expr.line = line;
     return expr;
 }
 
@@ -69,8 +70,8 @@ Expr eequality() {
         }
         else val = 1;
         last = other;
-        if (operation.type == BANG_EQUAL) exp = create_expr(val?"false":"true", val?FALSE:TRUE);
-        else if (operation.type == EQUAL_EQUAL) exp = create_expr(val?"true":"false", val?TRUE:FALSE);
+        if (operation.type == BANG_EQUAL) exp = create_expr(val?"false":"true", val?FALSE:TRUE, last.line);
+        else if (operation.type == EQUAL_EQUAL) exp = create_expr(val?"true":"false", val?TRUE:FALSE, last.line);
     }
     return exp;
 }
@@ -93,7 +94,7 @@ Expr ecomparison() {
         else if (operation.type == GREATER_EQUAL) val = expNumber >= otherNumber;
         else if (operation.type == LESS) val = expNumber < otherNumber;
         else if (operation.type == LESS_EQUAL) val = expNumber <= otherNumber;
-        exp = create_expr(val?"true":"false", val?TRUE:FALSE);
+        exp = create_expr(val?"true":"false", val?TRUE:FALSE, last.line);
     }
     return exp;
 }
@@ -110,13 +111,13 @@ Expr eterm() {
             char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
             if (operation.type == MINUS) sprintf(newDisplay, "%.7g", expNumber-otherNumber);
             else if (operation.type == PLUS) sprintf(newDisplay, "%.7g", expNumber+otherNumber);
-            exp = create_expr(newDisplay, NUMBER);
+            exp = create_expr(newDisplay, NUMBER, other.line);
         }
         else if (exp.type == STRING && other.type == STRING) {
             if (operation.type == MINUS); //type error
             char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 1);
             sprintf(newDisplay, "%s%s", exp.display, other.display);
-            exp = create_expr(newDisplay, STRING);
+            exp = create_expr(newDisplay, STRING, other.line);
         }
     }
     return exp;
@@ -133,7 +134,7 @@ Expr efactor() {
         char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
         if (operation.type == STAR) sprintf(newDisplay, "%.7g", expNumber*otherNumber);
         else if (operation.type == SLASH) sprintf(newDisplay, "%.7g", expNumber/otherNumber);
-        exp = create_expr(newDisplay, NUMBER);
+        exp = create_expr(newDisplay, NUMBER, other.line);
     }
     return exp;
 }
@@ -142,17 +143,21 @@ Expr efactor() {
 Expr eunary() {
     if (ematch(BANG)) {
         Expr exp = eunary();
-        if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE);
-        return create_expr("false", FALSE);
+        if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE, exp.line);
+        return create_expr("false", FALSE, exp.line);
 
     }
     if (ematch(MINUS)) {
         Expr exp = eunary();
-        if (exp.type != NUMBER); // must have type error 
+        if (exp.type != NUMBER) {
+            fprintf(stderr, "Operand must be a number.\n[line %d]\n", exp.line);
+            exit(70);
+        }
+
         float thatNumber = strtof(exp.display, NULL);
         char* newDisplay = (char* ) malloc(strlen(exp.display) + 8);
         sprintf(newDisplay, "%.7g", -thatNumber);
-        return create_expr(newDisplay, NUMBER);
+        return create_expr(newDisplay, NUMBER,exp.line);
     }
     return eprimary();
 }
@@ -161,13 +166,13 @@ Expr eunary() {
 Expr eprimary() {
     if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
         ematch(NIL)) {
-            return create_expr(eprevious()->lexeme,eprevious()->type);
+            return create_expr(eprevious()->lexeme,eprevious()->type,eprevious()->line);
         }
     else if (ematch(NUMBER)) {
         float thatNumber = strtof(eprevious()->lexeme, NULL);
         char* newDisplay = (char* ) malloc(strlen(eprevious()->lexeme) + 8);
         sprintf(newDisplay, "%.7g", thatNumber);
-        return create_expr(newDisplay, NUMBER);
+        return create_expr(newDisplay, NUMBER,eprevious()->line);
     }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();
