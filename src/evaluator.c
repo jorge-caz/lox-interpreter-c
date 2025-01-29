@@ -33,7 +33,7 @@ Token* eprevious() {
 }
 
 int eis_at_end() {
-    return etokenList[(*ecurrent) +1].type == TYPE_EOF;
+    return epeek()->type == TYPE_EOF;
 }
 
 int ematch(TokenType type) {
