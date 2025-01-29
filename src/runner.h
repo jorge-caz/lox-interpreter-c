@@ -4,7 +4,7 @@
 
 //it initializes the variables, and now the input only reads the first command until ;
 Token* tokenize_by_command(char* input, int* error);
-void next(); //changes is so now we are reading the next command
+Token* next(); //changes is so now we are reading the next command
 void run(char* input, int* error);
 
 Token* rpeek();
