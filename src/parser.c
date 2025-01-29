@@ -89,6 +89,7 @@ char* term() {
 // factor -> unary (("*" | "/") unary)*
 char* factor() {
     char* exp = unary();
+    printf("tokens: %s %s %s %s", tokenList[0].lexeme, tokenList[1].lexeme, tokenList[2].lexeme, tokenList[3].lexeme);
     printf("\nwe get an exp of %s\n", exp);
     printf("current is %d\n", current);
     while (match(STAR) || match(SLASH)) {
