@@ -194,7 +194,7 @@ Expr eprimary() {
         }
     } 
     else {
-        fprintf(stderr, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        fprintf(stderr, "[line %d] Error at '%s': Expect expression but got %d!", epeek()->line, epeek()->lexeme, (int) epeek()->type);
         exit(65);
     }
 }
