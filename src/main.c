@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "scanner.h"
+#include "parser.h"
 
 char *read_file_contents(const char *filename);
 
@@ -25,12 +26,8 @@ int main(int argc, char *argv[]) {
 
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
-            Token token = *tokens;
-            while (token.type != TYPE_EOF) {
-                printf("%s", token.lexeme);
-
-                tokens++; token = *tokens;
-            }
+            initialize(&tokens);
+            expression();
         }
         
         free(file_contents);
