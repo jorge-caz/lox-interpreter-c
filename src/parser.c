@@ -90,6 +90,7 @@ char* term() {
 char* factor() {
     char* exp = unary();
     printf("\nwe get an exp of %s\n", exp);
+    printf("current is %d\n", current);
     while (match(STAR) || match(SLASH)) {
         char* other = unary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
