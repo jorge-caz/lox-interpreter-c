@@ -3,6 +3,7 @@
 #include <string.h>
 #include "scanner.h"
 #include "parser.h"
+#include "evaluator.h"
 
 char *read_file_contents(const char *filename);
 
@@ -30,6 +31,17 @@ int main(int argc, char *argv[]) {
             char* exp = expression();
             if (!error)
             printf("%s", exp);
+        }
+        
+        free(file_contents);
+    }
+    else if (strcmp(command, "evaluate") == 0) {
+        if (strlen(file_contents) > 0) {
+            tokens = scan_tokens(file_contents, &error);
+            einitialize(&tokens, &error);
+            Expr exp = eexpression();
+            if (!error)
+            printf("%s", exp.display);
         }
         
         free(file_contents);
