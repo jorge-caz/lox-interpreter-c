@@ -44,7 +44,7 @@ char* expression() {
 char* equality() {
     char* exp = comparison();
     while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
-        Token operation = *peek();
+        Token operation = *previous();
         char* other = comparison();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 7);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
@@ -61,7 +61,7 @@ char* comparison() {
     char* exp = term();
     while (match(GREATER) || match(GREATER_EQUAL) ||
             match(LESS) || match(LESS_EQUAL)) {
-        Token operation = *peek();
+        Token operation = *previous();
         char* other = term();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + strlen(operation.lexeme) + 5);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
@@ -77,7 +77,7 @@ char* comparison() {
 char* term() {
     char* exp = factor();
     while (match(MINUS) || match(PLUS)) {
-        Token operation = *peek();
+        Token operation = *previous();
         char* other = factor();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
@@ -93,7 +93,7 @@ char* term() {
 char* factor() {
     char* exp = unary();
     while (match(STAR) || match(SLASH)) {
-        Token operation = *peek();
+        Token operation = *previous();
         char* other = unary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
@@ -108,7 +108,7 @@ char* factor() {
 // unary -> ("!" | "-") unary | primary
 char* unary() {
     if (match(BANG) || match(MINUS)) {
-        Token operation = *peek();
+        Token operation = *previous();
         char* exp = unary();
         char* value = (char* ) malloc(strlen(exp) + 4);
         sprintf(value, "(%s %s)", operation.lexeme, exp);
