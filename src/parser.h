@@ -11,7 +11,7 @@ int match(TokenType type);
 
 void expression();
 void equality();
-void comparsion();
+void comparison();
 void term();
 void factor();
 void unary();

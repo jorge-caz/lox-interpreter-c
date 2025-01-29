@@ -43,12 +43,12 @@ void expression() {
 void equality() {
     comparison();
     while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
-        printf(" %s ", previous()->lexeme); comparsion();
+        printf(" %s ", previous()->lexeme); comparison();
     }
 }
 
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
-void comparsion() {
+void comparison() {
     term();
     while (match(GREATER) || match(GREATER_EQUAL) ||
             match(LESS) || match(LESS_EQUAL)) {
