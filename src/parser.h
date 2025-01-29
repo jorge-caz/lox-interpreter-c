@@ -2,7 +2,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-void initialize(Token** tokens);
+void initialize(Token** tokens, int* error);
 Token* peek();
 Token* advance();
 Token* previous();
