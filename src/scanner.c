@@ -208,8 +208,11 @@ Token* scan_tokens(char* input, int* error) {
                 sprintf(newStri, "%g.0", num);
                 tokens[n] = create_token(NUMBER, newStri, line);
             }
-            else
-            tokens[n] = create_token(NUMBER, strdup(stri), line);
+            else {
+                char* newStri = (char* ) malloc(strlen(stri) + 1);
+                sprintf(newStri, "%.7g", num);
+                tokens[n] = create_token(NUMBER, newStri, line);
+            }
 
             *notnum = temp;
             stri = notnum; ch = *stri; 
