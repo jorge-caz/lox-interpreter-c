@@ -48,7 +48,7 @@ Token* tokenize_by_command(char* input) {
 Token* next() {
     program = next_index;
     next_index = strchr(program, ';');
-    if (next_index == NULL); //throw compilation error
+    if (next_index == NULL) return NULL;
     *next_index = '\0'; next_index++;
     curr = 0;
     return scan_tokens(program, rerror);
@@ -65,8 +65,7 @@ void run(char* input, int* error) {
             printf("%s", to_print.display);
         }
         current_tokens = next();
-        exit(0);
+        if (current_tokens == NULL) break;
         einitialize(&current_tokens, error, &curr);
     }
-    exit(0);
 }
