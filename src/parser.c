@@ -89,7 +89,8 @@ char* term() {
 char* factor() {
     char* exp = unary();
     printf("\nwe get an exp of %s\n", exp);
-    printf("and the token is %s", peek()->lexeme);
+    printf("and the token is %s\n", peek()->lexeme);
+    printf("the value of current is %d\n", current);
     while (match(STAR) || match(SLASH)) {
         char* other = unary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
