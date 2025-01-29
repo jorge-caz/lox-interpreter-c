@@ -43,7 +43,7 @@ char* expression() {
 char* equality() {
     char* exp = comparison();
     while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
-        char* other = term();
+        char* other = comparison();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 7);
         sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
 
@@ -72,9 +72,9 @@ char* comparison() {
 
 // term -> factor (("-" | "+") factor)*
 char* term() {
-    char* exp = unary();
+    char* exp = factor();
     while (match(MINUS) || match(PLUS)) {
-        char* other = unary();
+        char* other = factor();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
         sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
 
