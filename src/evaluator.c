@@ -5,11 +5,11 @@
 #include "evaluator.h"
 
 Token* etokenList;
-int ecurrent = 0;
+int* ecurrent;
 int* eerr;
 
-void einitialize(Token** tokens, int* error) {
-    etokenList = *tokens; eerr = error;
+void einitialize(Token** tokens, int* error, int* current) {
+    etokenList = *tokens; eerr = error; ecurrent = current;
 }
 
 Expr create_expr(const char* display, TokenType type, int line) {
@@ -21,15 +21,15 @@ Expr create_expr(const char* display, TokenType type, int line) {
 }
 
 Token* epeek() {
-    return &etokenList[ecurrent];
+    return &etokenList[*ecurrent];
 }
 Token* eadvance() {
-    if (!eis_at_end()) ecurrent++;
+    if (!eis_at_end()) *ecurrent++;
     return epeek();
 }
 Token* eprevious() {
-    if (ecurrent == 0) return epeek();
-    return &etokenList[ecurrent-1];
+    if (*ecurrent == 0) return epeek();
+    return &etokenList[*ecurrent-1];
 }
 
 int eis_at_end() {

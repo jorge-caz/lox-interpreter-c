@@ -14,10 +14,12 @@ Token create_token(TokenType type, const char* lexeme, int line) {
     return token;
 }
 
+int line = 1;
+
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
     char ch = *stri;
-    int line = 1;
+    
     const int size = strlen(input);
     Token *tokens = (Token*) malloc(size * sizeof(Token));
     
