@@ -9,12 +9,12 @@ Token* previous();
 int is_at_end();
 int match(TokenType type);
 
-void expression();
-void equality();
-void comparison();
-void term();
-void factor();
-void unary();
-void primary();
+char* expression();
+char* equality();
+char* comparison();
+char* term();
+char* factor();
+char* unary();
+char* primary();
 
 #endif

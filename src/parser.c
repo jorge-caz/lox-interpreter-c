@@ -35,60 +35,100 @@ int match(TokenType type) {
 }
 
 // expression -> equality
-void expression() {
-    equality();
+char* expression() {
+    return equality();
 }
 
 // equality -> comparison (("!=" | "==") comparison)*
-void equality() {
-    comparison();
+char* equality() {
+    char* exp = comparison();
     while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
-        printf(" %s ", previous()->lexeme); comparison();
+        char* other = term();
+        char* val = (char* ) malloc(strlen(exp) + strlen(other) + 7);
+        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+
+        free(exp);
+        free(other);
+        exp = val;
     }
+    return exp;
 }
 
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
-void comparison() {
-    term();
+char* comparison() {
+    char* exp = term();
     while (match(GREATER) || match(GREATER_EQUAL) ||
             match(LESS) || match(LESS_EQUAL)) {
-        printf(" %s ", previous()->lexeme); term();
+        char* other = term();
+        char* val = (char* ) malloc(strlen(exp) + strlen(other) + strlen(previous()->lexeme) + 5);
+        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+
+        free(exp);
+        free(other);
+        exp = val;
     }
+    return exp;
 }
 
 // term -> factor (("-" | "+") factor)*
-void term() {
-    factor();
+char* term() {
+    char* exp = unary();
     while (match(MINUS) || match(PLUS)) {
-        printf("(%s ", previous()->lexeme); factor(); printf(")");
+        char* other = unary();
+        char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
+        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+
+        free(exp);
+        free(other);
+        exp = val;
     }
+    return exp;
 }
 
 // factor -> unary (("*" | "/") unary)*
-void factor() {
-    unary();
+char* factor() {
+    char* exp = unary();
     while (match(STAR) || match(SLASH)) {
-        printf("(%s ", previous()->lexeme); unary(); printf(")");
+        char* other = unary();
+        char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
+        sprintf(val, "(%s %s %s)", previous()->lexeme, exp, other);
+
+        free(exp);
+        free(other);
+        exp = val;
     }
+    return exp;
 }
 
 // unary -> ("!" | "-") unary | primary
-void unary() {
+char* unary() {
     if (match(BANG) || match(MINUS)) {
-        printf("(%s ", previous()->lexeme); unary(); printf(")");
+        char* exp = unary();
+        char* value = (char* ) malloc(strlen(exp) + 4);
+        sprintf(value, "(%s %s)", previous()->lexeme, exp);
+        
+        free(exp);
+        return value;
     }
-    else primary();
+    return primary();
 }
 
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-void primary() {
+char* primary() {
     if (match(NUMBER) || match(STRING) || match(TRUE) || match(FALSE) ||
-        match(NIL)) printf("%s", previous()->lexeme);
+        match(NIL)) {
+            return strdup(previous()->lexeme);
+        }
     else if (match(LEFT_PAREN)) {
-        printf("(group ");
-        expression();
-        match(RIGHT_PAREN);
-        printf(")");
+        char* exp = expression();
+        char* value = (char* ) malloc(strlen(exp) + 9);
+        if (match(RIGHT_PAREN))
+        sprintf(value, "(group %s)", exp);
+        else; //must produce syntax error
+
+        free(exp);
+        return value;
     } 
+    else; //syntax error
 }
 
