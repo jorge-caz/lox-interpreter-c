@@ -8,7 +8,7 @@ typedef struct {
     int line;
 } Expr;
 
-void einitialize(Token** tokens, int* error);
+void einitialize(Token** tokens, int* error, int* current);
 Token* epeek();
 Token* eadvance();
 Token* eprevious();
