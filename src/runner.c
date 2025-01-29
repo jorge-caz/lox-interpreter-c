@@ -61,7 +61,7 @@ void run(char* input, int* error) {
     einitialize(&current_tokens, error, &curr);
     while (next_index != NULL) {
         if (rmatch(PRINT)) {
-            printf("curr is %d", curr);
+            printf("curr is %s", current_tokens[curr].lexeme);
             Expr to_print = eexpression();
             printf("%s", to_print.display);
         }
