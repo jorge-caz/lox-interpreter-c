@@ -62,7 +62,7 @@ void run(char* input, int* error) {
     while (next_index != NULL) {
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
-            printf("%s", to_print.display);
+            printf("%s\n", to_print.display);
         }
         current_tokens = next();
         if (current_tokens == NULL) break;
