@@ -8,7 +8,7 @@ Token* etokenList;
 int ecurrent = 0;
 int* err;
 
-void initialize(Token** tokens, int* error) {
+void einitialize(Token** tokens, int* error) {
     etokenList = *tokens; err = error;
 }
 
