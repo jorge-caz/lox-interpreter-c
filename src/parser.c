@@ -143,6 +143,7 @@ char* primary() {
     } 
     else {
         *err = 1;
+        fprintf(stderr, "%s", previous()->lexeme);
         fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
         exit(65);
     }

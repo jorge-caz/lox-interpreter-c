@@ -11,6 +11,7 @@ Token create_token(TokenType type, const char* lexeme, int line) {
     token.lexeme= lexeme;
     token.line = line;
     n++;
+    
     return token;
 }
 
@@ -19,10 +20,9 @@ int line = 1;
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
     char ch = *stri;
-    n = 0;
-    
+    n = -1;
     const int size = strlen(input);
-    Token *tokens = (Token*) malloc(size * sizeof(Token));
+    Token* tokens = (Token*) malloc(size * sizeof(Token));
     
     while (ch != '\0') {
         if (ch == '(') tokens[n] = create_token(LEFT_PAREN, "(", line);
@@ -176,7 +176,7 @@ Token* scan_tokens(char* input, int* error) {
                 continue;
             }
             else {
-                stri = strtok(stri+1, "\""); 
+                stri++; *endstr = '\0'; 
                 // may need to handle the line calculation
                 // idea to fix this: do a while loop from the first " 
                 // to the second " count instances of \n
@@ -412,7 +412,7 @@ void tokenize(char* input, int* error) {
                 break;
             }
             else {
-                stri = strtok(stri+1, "\""); 
+                stri++; *endstr = '\0'; 
                 // may need to handle the line calculation
                 // idea to fix this: do a while loop from the first " 
                 // to the second " count instances of \n

@@ -38,9 +38,8 @@ int rmatch(TokenType type) {
 
 //it initializes the variables, and now the input only reads the first command until ;
 Token* tokenize_by_command(char* input) {
-
     next_index = strchr(input, ';');
-    if (next_index == NULL); //throw compilation error
+    if (next_index == NULL) fprintf(stderr, "Expected a semicolon\n");
     program = input;
     *next_index = '\0'; next_index++;
     return scan_tokens(program, rerror);

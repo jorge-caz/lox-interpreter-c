@@ -65,7 +65,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Unknown command: %s\n", command);
         return 1;
     }
-
     exit(error ? 65: 0);
     return 0;
 }

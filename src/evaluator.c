@@ -175,7 +175,7 @@ Expr eunary() {
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
 Expr eprimary() {
     if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
-        ematch(NIL) || ematch(TYPE_EOF)) {
+        ematch(NIL)) {
             return create_expr(eprevious()->lexeme,eprevious()->type,eprevious()->line);
         }
     else if (ematch(NUMBER)) {
