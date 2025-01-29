@@ -176,6 +176,7 @@ Expr eunary() {
 Expr eprimary() {
     if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
         ematch(NIL)) {
+            printf("\nfor debugging: lexeme is %s\n", eprevious()->lexeme);
             return create_expr(eprevious()->lexeme,eprevious()->type,eprevious()->line);
         }
     else if (ematch(NUMBER)) {
