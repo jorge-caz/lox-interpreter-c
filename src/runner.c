@@ -65,9 +65,8 @@ void run(char* input, int* error) {
             printf("%s", to_print.display);
         }
         current_tokens = next();
-        if (next_index != NULL)
-        einitialize(&current_tokens, error, &curr);
         exit(0);
+        einitialize(&current_tokens, error, &curr);
     }
     exit(0);
 }
