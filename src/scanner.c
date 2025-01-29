@@ -17,7 +17,7 @@ Token* scan_tokens(char* input, int* error) {
     int line = 1;
     int n = 0;
     const int size = strlen(input);
-    Token *tokens = malloc(size * sizeof(Token));
+    Token *tokens = (Token*) malloc(size * sizeof(Token));
     
     while (ch != '\0') {
         if (ch == '(') tokens[n] = create_token(LEFT_PAREN, "(", line);
