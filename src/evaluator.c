@@ -83,7 +83,10 @@ Expr ecomparison() {
     while (ematch(GREATER) || ematch(GREATER_EQUAL) || ematch(LESS) || ematch(LESS_EQUAL)) {
         Token operation = *eprevious();
         Expr other = eterm();
-        if (last.type != NUMBER || other.type != NUMBER); // type error
+        if (last.type != NUMBER || other.type != NUMBER) {
+            fprintf(stderr, "Operands must be numbers.\n[line %d]\n", last.line);
+            exit(70);
+        }
         if (exp.type == FALSE) continue;
         float expNumber = strtof(last.display, NULL);
         float otherNumber = strtof(other.display, NULL);
@@ -119,16 +122,23 @@ Expr eterm() {
             sprintf(newDisplay, "%s%s", exp.display, other.display);
             exp = create_expr(newDisplay, STRING, other.line);
         }
+        else {
+            fprintf(stderr, "Operands must be two numbers or two strings.\n[line %d]\n", exp.line);
+            exit(70);
+        }
     }
     return exp;
-}
+}   
 // factor -> unary (("*" | "/") unary)*
 Expr efactor() {
     Expr exp = eunary();
     while (ematch(STAR) || ematch(SLASH)) {
         Token operation = *eprevious();
         Expr other = eunary();
-        if (exp.type != NUMBER || other.type != NUMBER); // type error
+        if (exp.type != NUMBER || other.type != NUMBER) {
+            fprintf(stderr, "Operands must be numbers.\n[line %d]\n", exp.line);
+            exit(70);
+        }
         float expNumber = strtof(exp.display, NULL);
         float otherNumber = strtof(other.display, NULL);
         char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
