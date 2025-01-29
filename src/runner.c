@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "runner.h"
 #include "scanner.h"
 #include "evaluator.h"
 
