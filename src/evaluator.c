@@ -148,10 +148,11 @@ Expr eunary() {
     }
     if (ematch(MINUS)) {
         Expr exp = eunary();
-        char* newstr = (char* ) malloc(strlen(exp.display) + 2);
-        sprintf(newstr, "-%s", exp.display);
-        if (exp.type == NUMBER) return create_expr(newstr, NUMBER);
-        // must have type error
+        if (exp.type != NUMBER); // must have type error 
+        float thatNumber = strtof(exp.display, NULL);
+        char* newDisplay = (char* ) malloc(strlen(exp.display) + 8);
+        sprintf(newDisplay, "%.7g", -thatNumber);
+        return create_expr(newDisplay, NUMBER);
     }
     return eprimary();
 }
