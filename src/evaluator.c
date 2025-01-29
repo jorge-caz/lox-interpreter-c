@@ -162,10 +162,16 @@ Expr eunary() {
 
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
 Expr eprimary() {
-    if (ematch(NUMBER) || ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
+    if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
         ematch(NIL)) {
             return create_expr(eprevious()->lexeme,eprevious()->type);
         }
+    else if (ematch(NUMBER)) {
+        float thatNumber = strtof(eprevious()->lexeme, NULL);
+        char* newDisplay = (char* ) malloc(strlen(eprevious()->lexeme) + 8);
+        sprintf(newDisplay, "%.7g", thatNumber);
+        return create_expr(newDisplay, NUMBER);
+    }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();
         if (ematch(RIGHT_PAREN))
