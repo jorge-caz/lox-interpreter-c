@@ -38,6 +38,7 @@ int rmatch(TokenType type) {
 
 //it initializes the variables, and now the input only reads the first command until ;
 Token* tokenize_by_command(char* input) {
+
     next_index = strchr(input, ';');
     if (next_index == NULL); //throw compilation error
     program = input;
