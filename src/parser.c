@@ -36,6 +36,7 @@ int match(TokenType type) {
 
 // expression -> equality
 void expression() {
+    printf("it runs");
     equality();
 }
 
