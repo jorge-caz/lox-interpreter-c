@@ -1,5 +1,4 @@
-#include "scanner.h"
-#include "hashtable.h"
+#include "evaluator.h"
 #ifndef RUNNER_H
 #define RUNNER_H
 

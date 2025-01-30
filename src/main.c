@@ -3,9 +3,7 @@
 #include <string.h>
 #include "scanner.h"
 #include "parser.h"
-#include "evaluator.h"
 #include "runner.h"
-#include "hashtable.h"
 
 char *read_file_contents(const char *filename);
 
