@@ -31,7 +31,7 @@ Expr lookup(HashTable* ht, char* key) {
     }
     Expr empty;
     empty.display = "nil";
-    empty.line = 0;
+    empty.line = -1;
     empty.type = NIL;
     return empty;
 }

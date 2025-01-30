@@ -68,7 +68,9 @@ void run(char* input, int* error, HashTable* ht) {
                 char* variable_name = rprevious()->lexeme;
                 if (rmatch(EQUAL)) {
                     Expr new_variable = eexpression();
-
+                    Expr at_variable = lookup(variable_expressions, variable_name);
+                    if (at_variable.line == -1) insert(variable_expressions, variable_name, new_variable);
+                    else; //error? function was already defined!
                 }
             }
         }

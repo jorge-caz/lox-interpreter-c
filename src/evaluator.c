@@ -185,6 +185,11 @@ Expr eprimary() {
         sprintf(newDisplay, "%.7g", thatNumber);
         return create_expr(newDisplay, NUMBER,eprevious()->line);
     }
+    else if (ematch(IDENTIFIER)) {
+        Expr var_value = lookup(evariables, eprevious()->lexeme);
+        if (var_value.line == -1); // not defined, throw error
+        return var_value;
+    }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();
         if (ematch(RIGHT_PAREN))
