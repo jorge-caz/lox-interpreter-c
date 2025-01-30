@@ -56,29 +56,29 @@ Token* next() {
 // returns expr.line=-1 if not assignment
 //assignment -> (identifier '=')* expression; 
 //assignment -> identifier '=' (assignment | expression);
-Expr rassignment(HashTable* ht) {
-    if (rmatch(IDENTIFIER)) {
-        char* variable_name = rprevious()->lexeme;
+// Expr rassignment(HashTable* ht) {
+//     if (rmatch(IDENTIFIER)) {
+//         char* variable_name = rprevious()->lexeme;
 
-        if (rmatch(EQUAL)) {
-            int at_peek = curr;
-            Expr other = eexpression();
-            curr = at_peek;
+//         if (rmatch(EQUAL)) {
+//             int at_peek = curr;
+//             Expr other = eexpression();
+//             curr = at_peek;
 
-            if (other.type == ERROR)
-            other = rassignment(ht);
+//             if (other.type == ERROR)
+//             other = rassignment(ht);
             
-            if (other.type == ERROR || other.line == -1)
-            return create_expr("nil", NIL, -1);
+//             if (other.type == ERROR || other.line == -1)
+//             return create_expr("nil", NIL, -1);
 
-            Expr at_variable = lookup(ht,variable_name);
-            if (at_variable.line==-1); //error! variable hasn't been declared
-            insert(ht, variable_name, other);
-            return other;
-        }
-    }
-    return create_expr("nil", NIL, -1);
-}
+//             Expr at_variable = lookup(ht,variable_name);
+//             if (at_variable.line==-1); //error! variable hasn't been declared
+//             insert(ht, variable_name, other);
+//             return other;
+//         }
+//     }
+//     return create_expr("nil", NIL, -1);
+// }
 
 
 void run(char* input, int* error, HashTable* ht) {
@@ -112,19 +112,19 @@ void run(char* input, int* error, HashTable* ht) {
                 }
             }
         }
-        else if (rpeek()->type == IDENTIFIER) {
-            Expr success = rassignment(variable_expressions);
-            if (success.line == -1) {
-               Expr compute = eexpression(); 
-               if (compute.type == ERROR) {
-                    fprintf(stderr, "%s", compute.display);
-                    exit(compute.line);
-                }
-            }
+        // else if (rpeek()->type == IDENTIFIER) {
+        //     Expr success = rassignment(variable_expressions);
+        //     if (success.line == -1) {
+        //        Expr compute = eexpression(); 
+        //        if (compute.type == ERROR) {
+        //             fprintf(stderr, "%s", compute.display);
+        //             exit(compute.line);
+        //         }
+        //     }
             
             
-            //assignment -> (identifier '=')* expression; 
-        }
+        //     //assignment -> (identifier '=')* expression; 
+        // }
         else {
             Expr to_compute = eexpression();
             if (to_compute.type == ERROR) {

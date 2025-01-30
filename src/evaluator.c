@@ -194,7 +194,8 @@ Expr eprimary() {
         return create_expr(newDisplay, NUMBER,eprevious()->line);
     }
     else if (ematch(IDENTIFIER)) {
-        Expr var_value = lookup(evariables, eprevious()->lexeme);
+        char* var_name = eprevious()->lexeme;
+        Expr var_value = lookup(evariables, var_name);
         if (var_value.line == -1) {
             char* error_message = (char* ) malloc(50 + strlen(epeek()->lexeme));
             sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", epeek()->lexeme, epeek()->line);
@@ -203,9 +204,10 @@ Expr eprimary() {
         }
 
         else if (ematch(EQUAL)) {
-            Expr exp = eexpression();
-            if (exp.type == ERROR) return exp;
-            insert(evariables, var_value.display, exp);
+            Expr new_value = eexpression();
+            if (new_value.type == ERROR) return new_value;
+            insert(evariables, var_name, new_value);
+            return new_value;
         }
 
         else if (eis_at_end()) return var_value;
