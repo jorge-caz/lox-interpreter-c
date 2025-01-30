@@ -54,9 +54,10 @@ Token* next() {
 } //changes is so now we are reading the next command
 
 void run(char* input, int* error, HashTable* ht) {
+    HashTable* variable_expressions = ht;
     rerror = error;
     current_tokens = tokenize_by_command(input);
-    einitialize(&current_tokens, error, &curr);
+    einitialize(&current_tokens, error, &curr, variable_expressions);
     while (next_index != NULL) {
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
@@ -76,6 +77,6 @@ void run(char* input, int* error, HashTable* ht) {
         }
         current_tokens = next();
         if (current_tokens == NULL) break;
-        einitialize(&current_tokens, error, &curr);
+        einitialize(&current_tokens, error, &curr, variable_expressions);
     }
 }
