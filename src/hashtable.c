@@ -14,7 +14,7 @@ unsigned int hash(const char* key) {
 void insert(HashTable* ht, const char* key, Expr value) {
     unsigned int index = hash(key);
     Pair* newPair = (Pair*) malloc(sizeof(Pair));
-    newPair->key = stdup(key);
+    newPair->key = strdup(key);
     newPair->value = value;
     newPair->next = ht->table[index];
     ht->table[index] = newPair;
