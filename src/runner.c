@@ -63,6 +63,9 @@ void run(char* input, int* error) {
             Expr to_print = eexpression();
             printf("%s\n", to_print.display);
         }
+        else {
+            Expr to_compute = eexpression();
+        }
         current_tokens = next();
         if (current_tokens == NULL) break;
         einitialize(&current_tokens, error, &curr);
