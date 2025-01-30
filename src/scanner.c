@@ -256,6 +256,7 @@ Token* scan_tokens(char* input, int* error) {
         stri++; ch = *stri; 
     }
     tokens[n] = create_token(TYPE_EOF, "", line);
+    printf("first token before return is: %s\n", tokens[0].lexeme);
     return tokens;
 }
 
