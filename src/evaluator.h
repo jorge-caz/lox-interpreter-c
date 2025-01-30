@@ -12,7 +12,7 @@ typedef struct {
 typedef struct Pair {
     char* key;
     Expr value;
-    Pair* next;
+    struct Pair* next;
 } Pair;
 
 typedef struct {
