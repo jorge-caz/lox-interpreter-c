@@ -19,6 +19,7 @@ int line = 1;
 
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
+    printf("we got this as stri: %s\n", stri);
     char ch = *stri;
     n = -1;
     const int size = strlen(input);
