@@ -3,7 +3,7 @@
 #include <string.h>
 #include "evaluator.h"
 
-unsigned int hash(char* key) {
+unsigned int hash(const char* key) {
     unsigned int hashValue = 0;
     while (*key) {
         hashValue += (unsigned int) *key++;
@@ -11,7 +11,7 @@ unsigned int hash(char* key) {
     return hashValue % TABLE_SIZE;
 }
 
-void insert(HashTable* ht, char* key, Expr value) {
+void insert(HashTable* ht, const char* key, Expr value) {
     unsigned int index = hash(key);
     Pair* newPair = (Pair*) malloc(sizeof(Pair));
     newPair->key = stdup(key);

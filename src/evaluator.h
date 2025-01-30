@@ -19,8 +19,8 @@ typedef struct {
     Pair* table[TABLE_SIZE];
 } HashTable;
 
-unsigned int hash(char* key);
-void insert(HashTable* ht, char* key, Expr value);
+unsigned int hash(const char* key);
+void insert(HashTable* ht, const char* key, Expr value);
 Expr lookup(HashTable* ht, const char* key);
 void freeHashTable(HashTable* ht);
 
