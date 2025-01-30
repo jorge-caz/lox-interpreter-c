@@ -20,132 +20,134 @@ int line = 1;
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
     char ch = *stri;
+    Token temp;
     n = 0;
     const int size = strlen(input);
     Token* tokens = (Token*) malloc(size * sizeof(Token));
     
     while (ch != '\0') {
-        if (ch == '(') tokens[n] = create_token(LEFT_PAREN, "(", line);
-        else if (ch == ')') tokens[n] = create_token(RIGHT_PAREN, ")", line);
-        else if (ch == '{') tokens[n] = create_token(LEFT_BRACE, "{", line);
-        else if (ch == '}') tokens[n] = create_token(RIGHT_BRACE, "}", line);
-        else if (ch == ',') tokens[n] = create_token(COMMA, ",", line);
-        else if (ch == '.') tokens[n] = create_token(DOT, ".", line);
-        else if (ch == '-') tokens[n] = create_token(MINUS, "-", line);
-        else if (ch == '+') tokens[n] = create_token(PLUS, "+", line);
-        else if (ch == ';') tokens[n] = create_token(SEMICOLON, ";", line);
-        else if (ch == '*') tokens[n] = create_token(STAR, "*", line);
+        int m = n;
+        if (ch == '(') tokens[m] = create_token(LEFT_PAREN, "(", line);
+        else if (ch == ')') tokens[m] = create_token(RIGHT_PAREN, ")", line);
+        else if (ch == '{') tokens[m] = create_token(LEFT_BRACE, "{", line);
+        else if (ch == '}') tokens[m] = create_token(RIGHT_BRACE, "}", line);
+        else if (ch == ',') tokens[m] = create_token(COMMA, ",", line);
+        else if (ch == '.') tokens[m] = create_token(DOT, ".", line);
+        else if (ch == '-') tokens[m] = create_token(MINUS, "-", line);
+        else if (ch == '+') tokens[m] = create_token(PLUS, "+", line);
+        else if (ch == ';') tokens[m] = create_token(SEMICOLON, ";", line);
+        else if (ch == '*') tokens[m] = create_token(STAR, "*", line);
         else if (ch == '=') {
             if (stri[1] == '=') { 
-                tokens[n] = create_token(EQUAL_EQUAL, "==", line);
+                tokens[m] = create_token(EQUAL_EQUAL, "==", line);
                 stri+=2; ch = *stri; 
                 continue;
             }
-            else tokens[n] = create_token(EQUAL, "=", line);
+            else tokens[m] = create_token(EQUAL, "=", line);
         }
         else if (ch == '!') {
             if (stri[1] == '=') {
-                tokens[n] = create_token(BANG_EQUAL, "!=", line);
+                tokens[m] = create_token(BANG_EQUAL, "!=", line);
                 stri+=2; ch = *stri; 
                 continue; 
             }
-            else tokens[n] = create_token(BANG, "!", line);
+            else tokens[m] = create_token(BANG, "!", line);
         }
         else if (ch == '<') {
             if (stri[1] == '=') {
-                tokens[n] = create_token(LESS_EQUAL, "<=", line);
+                tokens[m] = create_token(LESS_EQUAL, "<=", line);
                 stri+=2; ch = *stri; 
                 continue;
             }
-            else tokens[n] = create_token(LESS, "<", line);
+            else tokens[m] = create_token(LESS, "<", line);
         }
         else if (ch == '>') {
             if (stri[1] == '=') {
-                tokens[n] = create_token(GREATER_EQUAL, ">=", line);
+                tokens[m] = create_token(GREATER_EQUAL, ">=", line);
                 stri+=2; ch = *stri; 
                 continue;
             }
-            else tokens[n] = create_token(GREATER, ">", line);
+            else tokens[m] = create_token(GREATER, ">", line);
         }
 
         //KEYWORDS
         else if (strncmp(stri, "and", 3) == 0) {
-            tokens[n] = create_token(AND, "and", line);
+            tokens[m] = create_token(AND, "and", line);
             stri+=3; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "class", 5) == 0) {
-            tokens[n] = create_token(CLASS, "class", line);
+            tokens[m] = create_token(CLASS, "class", line);
             stri+=5; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "else", 4) == 0) {
-            tokens[n] = create_token(ELSE, "else", line);
+            tokens[m] = create_token(ELSE, "else", line);
             stri+=4; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "false", 5) == 0) {
-            tokens[n] = create_token(FALSE, "false", line);
+            tokens[m] = create_token(FALSE, "false", line);
             stri+=5; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "for", 3) == 0) {
-            tokens[n] = create_token(FOR, "for", line);
+            tokens[m] = create_token(FOR, "for", line);
             stri+=3; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "fun", 3) == 0) {
-            tokens[n] = create_token(FUN, "fun", line);
+            tokens[m] = create_token(FUN, "fun", line);
             stri+=3; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "if", 2) == 0) {
-            tokens[n] = create_token(IF, "if", line);
+            tokens[m] = create_token(IF, "if", line);
             stri+=2; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "nil", 3) == 0) {
-            tokens[n] = create_token(NIL, "nil", line);
+            tokens[m] = create_token(NIL, "nil", line);
             stri+=3; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "or", 2) == 0) {
-            tokens[n] = create_token(OR, "or", line);
+            tokens[m] = create_token(OR, "or", line);
             stri+=2; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "print", 5) == 0) {
-            tokens[n] = create_token(PRINT, "print", line);
+            tokens[m] = create_token(PRINT, "print", line);
             stri+=5; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "return", 6) == 0) {
-            tokens[n] = create_token(RETURN, "return", line);
+            tokens[m] = create_token(RETURN, "return", line);
             stri+=6; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "super", 5) == 0) {
-            tokens[n] = create_token(SUPER, "super", line);
+            tokens[m] = create_token(SUPER, "super", line);
             stri+=5; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "this", 4) == 0) {
-            tokens[n] = create_token(THIS, "this", line);
+            tokens[m] = create_token(THIS, "this", line);
             stri+=4; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "true", 4) == 0) {
-            tokens[n] = create_token(TRUE, "true", line);
+            tokens[m] = create_token(TRUE, "true", line);
             stri+=4; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "var", 3) == 0) {
-            tokens[n] = create_token(VAR, "var", line);
+            tokens[m] = create_token(VAR, "var", line);
             stri+=3; ch = *stri; 
             continue;
         }
         else if (strncmp(stri, "while", 5) == 0) {
-            tokens[n] = create_token(WHILE, "while", line);
+            tokens[m] = create_token(WHILE, "while", line);
             stri+=5; ch = *stri; 
             continue;
         }
@@ -160,7 +162,7 @@ Token* scan_tokens(char* input, int* error) {
                 continue;
             }
             else {
-                tokens[n] = create_token(SLASH, "/", line);
+                tokens[m] = create_token(SLASH, "/", line);
             }
         }
 
@@ -180,7 +182,7 @@ Token* scan_tokens(char* input, int* error) {
                 // may need to handle the line calculation
                 // idea to fix this: do a while loop from the first " 
                 // to the second " count instances of \n
-                tokens[n] = create_token(STRING, strdup(stri), line);
+                tokens[m] = create_token(STRING, strdup(stri), line);
                 stri = endstr+1; ch = *stri; 
                 continue;
             }
@@ -209,12 +211,12 @@ Token* scan_tokens(char* input, int* error) {
             if ((int) num == num) { 
                 char* newStri = (char* ) malloc(strlen(stri) + 3);
                 sprintf(newStri, "%g.0", num);
-                tokens[n] = create_token(NUMBER, newStri, line);
+                tokens[m] = create_token(NUMBER, newStri, line);
             }
             else {
                 char* newStri = (char* ) malloc(strlen(stri) + 1);
                 sprintf(newStri, "%.7g", num);
-                tokens[n] = create_token(NUMBER, newStri, line);
+                tokens[m] = create_token(NUMBER, newStri, line);
             }
 
             *notnum = temp;
@@ -233,7 +235,7 @@ Token* scan_tokens(char* input, int* error) {
                     notalphnum++;
             }
             char temp = *notalphnum; *notalphnum = '\0';
-            tokens[n] = create_token(IDENTIFIER, strdup(stri), line);
+            tokens[m] = create_token(IDENTIFIER, strdup(stri), line);
             *notalphnum = temp;
             stri = notalphnum; ch = *stri; 
             continue;
@@ -253,7 +255,8 @@ Token* scan_tokens(char* input, int* error) {
         }
         stri++; ch = *stri; 
     }
-    tokens[n] = create_token(TYPE_EOF, "", line);
+    int m = n;
+    tokens[m] = create_token(TYPE_EOF, "", line);
     return tokens;
 }
 
