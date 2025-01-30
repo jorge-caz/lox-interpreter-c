@@ -202,7 +202,13 @@ Expr eprimary() {
             return create_expr(error_message, ERROR, 70);
         }
 
-        if (eis_at_end()) return var_value;
+        else if (ematch(EQUAL)) {
+            Expr exp = eexpression();
+            if (exp.type == ERROR) return exp;
+            insert(evariables, var_value.display, exp);
+        }
+
+        else if (eis_at_end()) return var_value;
 
         char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
         sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
