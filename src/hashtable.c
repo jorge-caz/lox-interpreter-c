@@ -20,7 +20,7 @@ void insert(HashTable* ht, char* key, Expr value) {
     ht->table[index] = newPair;
 }
 
-Expr lookup(HashTable* ht, char* key) {
+Expr lookup(HashTable* ht, const char* key) {
     unsigned int index = hash(key);
     Pair* pair = ht->table[index];
     while (pair) {

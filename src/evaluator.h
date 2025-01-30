@@ -21,7 +21,7 @@ typedef struct {
 
 unsigned int hash(char* key);
 void insert(HashTable* ht, char* key, Expr value);
-Expr lookup(HashTable* ht, char* key);
+Expr lookup(HashTable* ht, const char* key);
 void freeHashTable(HashTable* ht);
 
 Token* epeek();
