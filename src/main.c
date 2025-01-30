@@ -77,8 +77,16 @@ char *read_file_contents(const char *filename) {
     }
 
     fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    rewind(file);
+    long file_size = 0;
+    char ch;
+
+    // Manually count the valid bytes (skip '\r')
+    fseek(file, 0, SEEK_SET);  // Move the file pointer back to the beginning
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch != '\r') {  // Ignore carriage return
+            file_size++;
+        }
+    }
 
     char *file_contents = malloc(file_size + 1);
     if (file_contents == NULL) {
@@ -87,7 +95,11 @@ char *read_file_contents(const char *filename) {
         return NULL;
     }
 
+
+    fseek(file, 0, SEEK_SET); 
     size_t bytes_read = fread(file_contents, 1, file_size, file);
+    file_contents[file_size] = '\0';
+    
     if (bytes_read < file_size) {
         fprintf(stderr, "Error reading file contents\n");
         free(file_contents);
