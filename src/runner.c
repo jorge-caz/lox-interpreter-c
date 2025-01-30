@@ -4,7 +4,6 @@
 #include "runner.h"
 #include "scanner.h"
 #include "evaluator.h"
-#include "hashtable.h"
 
 char* program;
 char* next_index;
