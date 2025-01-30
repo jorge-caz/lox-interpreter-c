@@ -57,7 +57,6 @@ Token* next() {
 void run(char* input, int* error) {
     rerror = error;
     current_tokens = tokenize_by_command(input);
-    printf("first token is %s\n", current_tokens[-1].lexeme);
     einitialize(&current_tokens, error, &curr);
     while (next_index != NULL) {
         if (rmatch(PRINT)) {

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "scanner.h"
 
-int n = -1;
+int n = 0;
 
 Token create_token(TokenType type, const char* lexeme, int line) {
     Token token;
@@ -11,7 +11,6 @@ Token create_token(TokenType type, const char* lexeme, int line) {
     token.lexeme= lexeme;
     token.line = line;
     n++;
-    printf("we got this as our %dth token: %s\n", n, token.lexeme);
     
     return token;
 }
@@ -20,9 +19,8 @@ int line = 1;
 
 Token* scan_tokens(char* input, int* error) {
     char* stri = input;
-    printf("we got this as stri: %s\n", stri);
     char ch = *stri;
-    n = -1;
+    n = 0;
     const int size = strlen(input);
     Token* tokens = (Token*) malloc(size * sizeof(Token));
     
@@ -256,7 +254,6 @@ Token* scan_tokens(char* input, int* error) {
         stri++; ch = *stri; 
     }
     tokens[n] = create_token(TYPE_EOF, "", line);
-    printf("first token before return is: %s\n", tokens[0].lexeme);
     return tokens;
 }
 
