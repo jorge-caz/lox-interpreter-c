@@ -37,7 +37,9 @@ int main(int argc, char *argv[]) {
         free(file_contents);
     }
     else if (strcmp(command, "run") == 0) {
+        printf("here it runs 1\n");
         if (strlen(file_contents) > 0) {
+            printf("here it runs 2\n");
             run(file_contents, &error);
         }
         

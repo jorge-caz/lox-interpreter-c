@@ -56,13 +56,19 @@ Token* next() {
 
 void run(char* input, int* error) {
     rerror = error;
+    printf("here it runs 3\n");
     current_tokens = tokenize_by_command(input);
+    printf("here it runs 4\n");
     einitialize(&current_tokens, error, &curr);
+    printf("here it runs 5\n");
     while (next_index != NULL) {
+        printf("here it runs 6\n");
         if (rmatch(PRINT)) {
+            printf("here it runs 7\n");
             Expr to_print = eexpression();
             printf("%s\n", to_print.display);
         }
+        printf("here it runs 8\n");
         current_tokens = next();
         if (current_tokens == NULL) break;
         einitialize(&current_tokens, error, &curr);
