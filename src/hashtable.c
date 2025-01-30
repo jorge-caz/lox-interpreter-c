@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "evaluator.h"
-#include "hashtable.h"
 
 unsigned int hash(char* key) {
     unsigned int hashValue = 0;
