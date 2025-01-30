@@ -34,7 +34,7 @@ Token* eprevious() {
 }
 
 int eis_at_end() {
-    return epeek()->type == TYPE_EOF;
+    return (epeek()->type == TYPE_EOF && *ecurrent >= 0);
 }
 
 int ematch(TokenType type) {
@@ -85,8 +85,10 @@ Expr ecomparison() {
         Token operation = *eprevious();
         Expr other = eterm();
         if (last.type != NUMBER || other.type != NUMBER) {
-            fprintf(stderr, "Operands must be numbers.\n[line %d]\n", last.line);
-            exit(70);
+            char* error_message = (char* ) malloc(50);
+            sprintf(error_message, "Operands must be numbers.\n[line %d]\n", last.line);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 70);
         }
         if (exp.type == FALSE) continue;
         float expNumber = strtof(last.display, NULL);
@@ -124,8 +126,10 @@ Expr eterm() {
             exp = create_expr(newDisplay, STRING, other.line);
         }
         else {
-            fprintf(stderr, "Operands must be two numbers or two strings.\n[line %d]\n", exp.line);
-            exit(70);
+            char* error_message = (char* ) malloc(70);
+            sprintf(error_message, "Operands must be two numbers or two strings.\n[line %d]\n", exp.line);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 70);
         }
     }
     return exp;
@@ -137,8 +141,10 @@ Expr efactor() {
         Token operation = *eprevious();
         Expr other = eunary();
         if (exp.type != NUMBER || other.type != NUMBER) {
-            fprintf(stderr, "Operands must be numbers.\n[line %d]\n", exp.line);
-            exit(70);
+            char* error_message = (char* ) malloc(55);
+            sprintf(error_message, "Operands must be numbers.\n[line %d]\n", exp.line);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 70);
         }
         float expNumber = strtof(exp.display, NULL);
         float otherNumber = strtof(other.display, NULL);
@@ -161,8 +167,10 @@ Expr eunary() {
     if (ematch(MINUS)) {
         Expr exp = eunary();
         if (exp.type != NUMBER) {
-            fprintf(stderr, "Operand must be a number.\n[line %d]\n", exp.line);
-            exit(70);
+            char* error_message = (char* ) malloc(50);
+            sprintf(error_message, "Operand must be a number.\n[line %d]\n", exp.line);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 70);
         }
 
         float thatNumber = strtof(exp.display, NULL);
@@ -188,23 +196,36 @@ Expr eprimary() {
     else if (ematch(IDENTIFIER)) {
         Expr var_value = lookup(evariables, eprevious()->lexeme);
         if (var_value.line == -1) {
-            fprintf(stderr, "Undefined variable '%s'.\n[line %d]\n", epeek()->lexeme, epeek()->line);
-            exit(70);
+            char* error_message = (char* ) malloc(50 + strlen(epeek()->lexeme));
+            sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", epeek()->lexeme, epeek()->line);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 70);
         }
-        return var_value;
+
+        if (eis_at_end()) return var_value;
+
+        char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
+        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        *ecurrent = -1;
+        return create_expr(error_message, ERROR, 65);
+        
     }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();
         if (ematch(RIGHT_PAREN))
         return exp;
         else {
-            fprintf(stderr, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
-            exit(65);
+            char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
+            sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+            *ecurrent = -1;
+            return create_expr(error_message, ERROR, 65);
         }
     } 
     else {
-        fprintf(stderr, "[line %d] Error at '%s': Expect expression but got %d!", epeek()->line, epeek()->lexeme, (int) epeek()->type);
-        exit(65);
+        char* error_message = (char* ) malloc(75 + strlen(epeek()->lexeme));
+        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        *ecurrent = -1;
+        return create_expr(error_message, ERROR, 65);
     }
 }
 

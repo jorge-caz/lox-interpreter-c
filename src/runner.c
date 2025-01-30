@@ -53,6 +53,34 @@ Token* next() {
     return scan_tokens(program, rerror);
 } //changes is so now we are reading the next command
 
+// returns expr.line=-1 if not assignment
+//assignment -> (identifier '=')* expression; 
+//assignment -> identifier '=' (assignment | expression);
+Expr rassignment(HashTable* ht) {
+    if (rmatch(IDENTIFIER)) {
+        char* variable_name = rprevious()->lexeme;
+
+        if (rmatch(EQUAL)) {
+            int at_peek = curr;
+            Expr other = eexpression();
+            curr = at_peek;
+
+            if (other.type == ERROR)
+            other = rassignment(ht);
+            
+            if (other.type == ERROR || other.line == -1)
+            return create_expr("nil", NIL, -1);
+
+            Expr at_variable = lookup(ht,variable_name);
+            if (at_variable.line==-1); //error! variable hasn't been declared
+            insert(ht, variable_name, other);
+            return other;
+        }
+    }
+    return create_expr("nil", NIL, -1);
+}
+
+
 void run(char* input, int* error, HashTable* ht) {
     HashTable* variable_expressions = ht;
     rerror = error;
@@ -61,6 +89,10 @@ void run(char* input, int* error, HashTable* ht) {
     while (next_index != NULL) {
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
+            if (to_print.type == ERROR) {
+                fprintf(stderr, "%s", to_print.display);
+                exit(to_print.line);
+            }
             printf("%s\n", to_print.display);
         }
         else if (rmatch(VAR)) {
@@ -68,6 +100,10 @@ void run(char* input, int* error, HashTable* ht) {
                 char* variable_name = rprevious()->lexeme;
                 if (rmatch(EQUAL)) {
                     Expr new_variable = eexpression();
+                    if (new_variable.type == ERROR) {
+                        fprintf(stderr, "%s", new_variable.display);
+                        exit(new_variable.line);
+                    }
                     insert(variable_expressions, variable_name, new_variable);
                 }
                 else if (rmatch(TYPE_EOF)) {
@@ -76,8 +112,25 @@ void run(char* input, int* error, HashTable* ht) {
                 }
             }
         }
+        else if (rpeek()->type == IDENTIFIER) {
+            Expr success = rassignment(variable_expressions);
+            if (success.line == -1) {
+               Expr compute = eexpression(); 
+               if (compute.type == ERROR) {
+                    fprintf(stderr, "%s", compute.display);
+                    exit(compute.line);
+                }
+            }
+            
+            
+            //assignment -> (identifier '=')* expression; 
+        }
         else {
             Expr to_compute = eexpression();
+            if (to_compute.type == ERROR) {
+                    fprintf(stderr, "%s", to_compute.display);
+                    exit(to_compute.line);
+                }
         }
         current_tokens = next();
         if (current_tokens == NULL) break;

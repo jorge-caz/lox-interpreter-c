@@ -50,6 +50,10 @@ int main(int argc, char *argv[]) {
             int curr = 0;
             einitialize(&tokens, &error, &curr, &variables);
             Expr exp = eexpression();
+            if (exp.type == ERROR) {
+                fprintf(stderr, "%s", exp.display);
+                exit(exp.line);
+            }
             if (!error)
             printf("%s", exp.display);
         }
