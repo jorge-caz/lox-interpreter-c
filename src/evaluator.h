@@ -23,6 +23,7 @@ unsigned int hash(const char* key);
 void insert(HashTable* ht, const char* key, Expr value);
 Expr lookup(HashTable* ht, const char* key);
 void freeHashTable(HashTable* ht);
+void create_hashtable(HashTable* ht);
 
 Token* epeek();
 Token* eadvance();

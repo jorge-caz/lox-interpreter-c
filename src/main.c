@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     int error = 0;
     Token* tokens;
-    HashTable variables;
+    HashTable variables; create_hashtable(&variables);
 
     const char *command = argv[1];
     char* file_contents = read_file_contents(argv[2]);

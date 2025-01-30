@@ -3,6 +3,12 @@
 #include <string.h>
 #include "evaluator.h"
 
+void create_hashtable(HashTable* ht) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        ht->table[i] = NULL;  // Initialize all elements to NULL
+    }
+}
+
 unsigned int hash(const char* key) {
     unsigned int hashValue = 0;
     while (*key) {
