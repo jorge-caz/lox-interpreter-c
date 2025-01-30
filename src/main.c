@@ -76,21 +76,21 @@ char *read_file_contents(const char *filename) {
         return NULL;
     }
 
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    rewind(file);
-
     // fseek(file, 0, SEEK_END);
-    // long file_size = 0;
-    // char ch;
+    // long file_size = ftell(file);
+    // rewind(file);
+
+    fseek(file, 0, SEEK_END);
+    long file_size = 0;
+    char ch;
 
     // Manually count the valid bytes (skip '\r')
-    // fseek(file, 0, SEEK_SET);  // Move the file pointer back to the beginning
-    // while ((ch = fgetc(file)) != EOF) {
-    //     if (ch != '\r') {  // Ignore carriage return
-    //         file_size++;
-    //     }
-    // }
+    fseek(file, 0, SEEK_SET);  // Move the file pointer back to the beginning
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch != '\r') {  // Ignore carriage return
+            file_size++;
+        }
+    }
 
     char *file_contents = malloc(file_size + 1);
     if (file_contents == NULL) {
