@@ -19,11 +19,26 @@ unsigned int hash(const char* key) {
 
 void insert(HashTable* ht, const char* key, Expr value) {
     unsigned int index = hash(key);
+    Pair* pair = ht->table[index];
+
+    // Search for the key in the linked list
+    while (pair) {
+        if (strcmp(pair->key, key) == 0) {
+            // Key already exists, update value and return
+            pair->value = value;
+            return;
+        }
+        pair = pair->next;
+    }
+
     Pair* newPair = (Pair*) malloc(sizeof(Pair));
     newPair->key = strdup(key);
     newPair->value = value;
     newPair->next = ht->table[index];
     ht->table[index] = newPair;
+
+
+
 }
 
 Expr lookup(HashTable* ht, const char* key) {
