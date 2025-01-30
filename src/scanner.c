@@ -3,7 +3,7 @@
 #include <string.h>
 #include "scanner.h"
 
-int n = 0;
+int n = -1;
 
 Token create_token(TokenType type, const char* lexeme, int line) {
     Token token;
