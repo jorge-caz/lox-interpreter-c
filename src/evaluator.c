@@ -187,7 +187,10 @@ Expr eprimary() {
     }
     else if (ematch(IDENTIFIER)) {
         Expr var_value = lookup(evariables, eprevious()->lexeme);
-        if (var_value.line == -1); // not defined, throw error
+        if (var_value.line == -1) {
+            fprintf(stderr, "Undefined variable '%s'.\n[line %d]\n", epeek()->lexeme, epeek()->line);
+            exit(70);
+        }
         return var_value;
     }
     else if (ematch(LEFT_PAREN)) {
