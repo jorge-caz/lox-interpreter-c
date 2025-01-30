@@ -9,7 +9,7 @@ int* ecurrent;
 int* eerr;
 HashTable* evariables;
 
-void einitialize(Token** tokens, int* error, int* current, HashTable* ht); {
+void einitialize(Token** tokens, int* error, int* current, HashTable* ht) {
     etokenList = *tokens; eerr = error; ecurrent = current; evariables = ht;
 }
 

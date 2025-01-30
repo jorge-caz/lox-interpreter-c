@@ -24,12 +24,12 @@ void insert(HashTable* ht, char* key, Expr value);
 Expr lookup(HashTable* ht, char* key);
 void freeHashTable(HashTable* ht);
 
-void einitialize(Token** tokens, int* error, int* current, HashTable* ht);
 Token* epeek();
 Token* eadvance();
 Token* eprevious();
 int eis_at_end();
 int ematch(TokenType type);
+void einitialize(Token** tokens, int* error, int* current, HashTable* ht);
 
 Expr eexpression();
 Expr eequality();
