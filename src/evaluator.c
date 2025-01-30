@@ -57,6 +57,7 @@ Expr eequality() {
     while (ematch(BANG_EQUAL) || ematch(EQUAL_EQUAL)) {
         Token operation = *eprevious();
         Expr other = ecomparison();
+        if (other.type == ERROR) other;
         int val;
         if (last.type != other.type) {
             val = 0;
@@ -84,6 +85,7 @@ Expr ecomparison() {
     while (ematch(GREATER) || ematch(GREATER_EQUAL) || ematch(LESS) || ematch(LESS_EQUAL)) {
         Token operation = *eprevious();
         Expr other = eterm();
+        if (other.type == ERROR) return other;
         if (last.type != NUMBER || other.type != NUMBER) {
             char* error_message = (char* ) malloc(50);
             sprintf(error_message, "Operands must be numbers.\n[line %d]\n", last.line);
@@ -111,6 +113,7 @@ Expr eterm() {
     while (ematch(MINUS) || ematch(PLUS)) {
         Token operation = *eprevious();
         Expr other = efactor();
+        if (other.type == ERROR) return other;
         if (exp.type == NUMBER && other.type == NUMBER) {
             float expNumber = strtof(exp.display, NULL);
             float otherNumber = strtof(other.display, NULL);
@@ -140,6 +143,7 @@ Expr efactor() {
     while (ematch(STAR) || ematch(SLASH)) {
         Token operation = *eprevious();
         Expr other = eunary();
+        if (other.type == ERROR) other;
         if (exp.type != NUMBER || other.type != NUMBER) {
             char* error_message = (char* ) malloc(55);
             sprintf(error_message, "Operands must be numbers.\n[line %d]\n", exp.line);
@@ -160,12 +164,14 @@ Expr efactor() {
 Expr eunary() {
     if (ematch(BANG)) {
         Expr exp = eunary();
+        if (exp.type == ERROR) return exp;
         if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE, exp.line);
         return create_expr("false", FALSE, exp.line);
 
     }
     if (ematch(MINUS)) {
         Expr exp = eunary();
+        if (exp.type == ERROR) return exp;
         if (exp.type != NUMBER) {
             char* error_message = (char* ) malloc(50);
             sprintf(error_message, "Operand must be a number.\n[line %d]\n", exp.line);
@@ -197,8 +203,8 @@ Expr eprimary() {
         char* var_name = eprevious()->lexeme;
         Expr var_value = lookup(evariables, var_name);
         if (var_value.line == -1) {
-            char* error_message = (char* ) malloc(50 + strlen(epeek()->lexeme));
-            sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", epeek()->lexeme, epeek()->line);
+            char* error_message = (char* ) malloc(50 + strlen(var_name));
+            sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", var_name, epeek()->line);
             *ecurrent = -1;
             return create_expr(error_message, ERROR, 70);
         }
@@ -214,6 +220,7 @@ Expr eprimary() {
     }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();
+        if (exp.type == ERROR) return exp;
         if (ematch(RIGHT_PAREN))
         return exp;
         else {
