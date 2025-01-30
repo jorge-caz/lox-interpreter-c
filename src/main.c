@@ -99,6 +99,7 @@ char *read_file_contents(const char *filename) {
     fseek(file, 0, SEEK_SET); 
     size_t bytes_read = fread(file_contents, 1, file_size, file);
     file_contents[file_size] = '\0';
+
     
     if (bytes_read < file_size) {
         fprintf(stderr, "Error reading file contents\n");
