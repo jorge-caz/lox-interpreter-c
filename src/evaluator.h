@@ -1,4 +1,5 @@
 #include "scanner.h"
+#include "hashtable.h"
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
 
@@ -8,7 +9,7 @@ typedef struct {
     int line;
 } Expr;
 
-void einitialize(Token** tokens, int* error, int* current);
+void einitialize(Token** tokens, int* error, int* current, HashTable* ht);
 Token* epeek();
 Token* eadvance();
 Token* eprevious();

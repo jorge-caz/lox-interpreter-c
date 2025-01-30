@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "evaluator.h"
 #include "runner.h"
+#include "hashtable.h"
 
 char *read_file_contents(const char *filename);
 
@@ -20,6 +21,8 @@ int main(int argc, char *argv[]) {
 
     int error = 0;
     Token* tokens;
+    HashTable variables;
+
     const char *command = argv[1];
     char* file_contents = read_file_contents(argv[2]);
 
@@ -38,7 +41,7 @@ int main(int argc, char *argv[]) {
     }
     else if (strcmp(command, "run") == 0) {
         if (strlen(file_contents) > 0) {
-            run(file_contents, &error);
+            run(file_contents, &error, &variables);
         }
         
         free(file_contents);
@@ -47,7 +50,7 @@ int main(int argc, char *argv[]) {
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
             int curr = 0;
-            einitialize(&tokens, &error, &curr);
+            einitialize(&tokens, &error, &curr, &variables);
             Expr exp = eexpression();
             if (!error)
             printf("%s", exp.display);

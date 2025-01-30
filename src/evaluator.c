@@ -7,9 +7,10 @@
 Token* etokenList;
 int* ecurrent;
 int* eerr;
+HashTable* evariables;
 
-void einitialize(Token** tokens, int* error, int* current) {
-    etokenList = *tokens; eerr = error; ecurrent = current;
+void einitialize(Token** tokens, int* error, int* current, HashTable* ht); {
+    etokenList = *tokens; eerr = error; ecurrent = current; evariables = ht;
 }
 
 Expr create_expr(const char* display, TokenType type, int line) {

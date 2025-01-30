@@ -4,6 +4,7 @@
 #include "runner.h"
 #include "scanner.h"
 #include "evaluator.h"
+#include "hashtable.h"
 
 char* program;
 char* next_index;
@@ -53,8 +54,7 @@ Token* next() {
     return scan_tokens(program, rerror);
 } //changes is so now we are reading the next command
 
-
-void run(char* input, int* error) {
+void run(char* input, int* error, HashTable* ht) {
     rerror = error;
     current_tokens = tokenize_by_command(input);
     einitialize(&current_tokens, error, &curr);
@@ -62,6 +62,15 @@ void run(char* input, int* error) {
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
             printf("%s\n", to_print.display);
+        }
+        else if (rmatch(VAR)) {
+            if (rmatch(IDENTIFIER)) {
+                char* variable_name = rprevious()->lexeme;
+                if (rmatch(EQUAL)) {
+                    Expr new_variable = eexpression();
+
+                }
+            }
         }
         else {
             Expr to_compute = eexpression();
