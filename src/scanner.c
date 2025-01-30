@@ -11,7 +11,7 @@ Token create_token(TokenType type, const char* lexeme, int line) {
     token.lexeme= lexeme;
     token.line = line;
     n++;
-    printf("we got this as our %nth token: %s\n", n, token.lexeme);
+    printf("we got this as our %dth token: %s\n", n, token.lexeme);
     
     return token;
 }
