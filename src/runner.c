@@ -59,7 +59,7 @@ void run(char* input, int* error) {
     current_tokens = tokenize_by_command(input);
     einitialize(&current_tokens, error, &curr);
     while (next_index != NULL) {
-        printf("the token is %s\n", rpeek()->lexeme);
+        printf("the token is %s and curr is %d\n", rpeek()->lexeme, curr);
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
             printf("%s\n", to_print.display);
