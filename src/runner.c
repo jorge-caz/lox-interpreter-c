@@ -42,6 +42,7 @@ Token* tokenize_by_command(char* input) {
     if (next_index == NULL) fprintf(stderr, "Expected a semicolon\n");
     program = input;
     *next_index = '\0'; next_index++;
+    printf("program is %s\n", program);
     return scan_tokens(program, rerror);
 }
 Token* next() {
@@ -59,7 +60,6 @@ void run(char* input, int* error) {
     current_tokens = tokenize_by_command(input);
     einitialize(&current_tokens, error, &curr);
     while (next_index != NULL) {
-        printf("the token is %s and curr is %d\n", rpeek()->lexeme, curr);
         if (rmatch(PRINT)) {
             Expr to_print = eexpression();
             printf("%s\n", to_print.display);
