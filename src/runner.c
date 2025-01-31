@@ -91,7 +91,8 @@ void run(char* input, int* error, HashTable* ht) {
     current_tokens = scan_tokens(input, error);
     validate_braces(current_tokens);
     einitialize(&current_tokens, error, &curr, variable_expressions);
-    Expr to_compute = ecode();
+    HashTable* global_scope = create_scope(NULL);
+    Expr to_compute = ecode(global_scope);
     if (to_compute.type == ERROR) {
         fprintf(stderr, "%s", to_compute.display);
         exit(to_compute.line);

@@ -40,16 +40,34 @@ void insert(HashTable* ht, const char* key, Expr value) {
 
 
 }
+// Create a new scope with a reference to the parent
+HashTable* create_scope(HashTable* parent) {
+    HashTable* newScope = (HashTable*) malloc(sizeof(HashTable));
+    create_hashtable(newScope);  // Initialize the new scope
+    newScope->parent = parent;   // Set parent scope
+    return newScope;
+}
+
+void destroy_scope(HashTable* scope) {
+    freeHashTable(scope);  // Free the variables inside the scope
+    free(scope);           // Free the scope itself
+}
 
 Expr lookup(HashTable* ht, const char* key) {
-    unsigned int index = hash(key);
-    Pair* pair = ht->table[index];
-    while (pair) {
-        if (strcmp(pair->key, key) == 0) {
-            return pair->value;
+    while (ht) {
+        unsigned int index = hash(key);
+        Pair* pair = ht->table[index];
+
+        while (pair) {
+            if (strcmp(pair->key, key) == 0) {
+                return pair->value;
+            }
+            pair = pair->next;
         }
-        pair = pair->next;
+
+        ht = ht->parent;
     }
+
     Expr empty;
     empty.display = "nil";
     empty.line = -1;

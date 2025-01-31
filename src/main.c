@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
             tokens = scan_tokens(file_contents, &error);
             int curr = 0;
             einitialize(&tokens, &error, &curr, &variables);
-            Expr exp = eexpression();
+            HashTable* global_scope = create_scope(NULL);
+            Expr exp = eexpression(global_scope);
             if (exp.type == ERROR) {
                 fprintf(stderr, "%s", exp.display);
                 exit(exp.line);

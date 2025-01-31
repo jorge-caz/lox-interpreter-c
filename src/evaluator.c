@@ -48,9 +48,9 @@ int ematch(TokenType type) {
 
 
 // code -> block*
-Expr ecode() {
+Expr ecode(HashTable* scope) {
     while (!eis_at_end()) {
-        Expr bl = eblock();
+        Expr bl = eblock(scope);
         if (epeek()->type == RIGHT_BRACE)
         return create_expr("nil", NIL, -1);
         if (bl.type == ERROR) return bl;
@@ -59,10 +59,15 @@ Expr ecode() {
 }
 
 // block -> statement | '{' block* '}'
-Expr eblock() {
+Expr eblock(HashTable* scope) {
     if (ematch(LEFT_BRACE)) {
-        Expr cod = ecode();
+        HashTable* newScope = create_scope(scope);
+        
+        Expr cod = ecode(newScope);
         if (cod.type == ERROR) return cod;
+
+        destroy_scope(newScope);
+
         if (ematch(RIGHT_BRACE)) return create_expr("nil", NIL, -1);
         
         char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
@@ -70,15 +75,15 @@ Expr eblock() {
         *ecurrent = -1;
         return create_expr(error_message, ERROR, 65);
     }
-    Expr stat = estatement();
+    Expr stat = estatement(scope);
     if (stat.type == ERROR) return stat;
     return create_expr("nil", NIL, -1);
 
 }
 
 // statement -> expression ';';
-Expr estatement() {
-    Expr expre = eexpression();
+Expr estatement(HashTable* scope) {
+    Expr expre = eexpression(scope);
     if (expre.type == ERROR) return expre;
     if (!ematch(SEMICOLON)) {
         char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
@@ -90,17 +95,17 @@ Expr estatement() {
 }
 
 // expression -> equality
-Expr eexpression() {
-    return eequality();
+Expr eexpression(HashTable* scope) {
+    return eequality(scope);
 }
 
 // equality -> comparison (("!=" | "==") comparison)*
-Expr eequality() {
-    Expr exp = ecomparison();
+Expr eequality(HashTable* scope) {
+    Expr exp = ecomparison(scope);
     Expr last = exp;
     while (ematch(BANG_EQUAL) || ematch(EQUAL_EQUAL)) {
         Token operation = *eprevious();
-        Expr other = ecomparison();
+        Expr other = ecomparison(scope);
         if (other.type == ERROR) other;
         int val;
         if (last.type != other.type) {
@@ -123,12 +128,12 @@ Expr eequality() {
 }
 
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
-Expr ecomparison() {
-    Expr exp = eterm();
+Expr ecomparison(HashTable* scope) {
+    Expr exp = eterm(scope);
     Expr last = exp;
     while (ematch(GREATER) || ematch(GREATER_EQUAL) || ematch(LESS) || ematch(LESS_EQUAL)) {
         Token operation = *eprevious();
-        Expr other = eterm();
+        Expr other = eterm(scope);
         if (other.type == ERROR) return other;
         if (last.type != NUMBER || other.type != NUMBER) {
             char* error_message = (char* ) malloc(50);
@@ -152,11 +157,11 @@ Expr ecomparison() {
 }
 
 // term -> factor (("-" | "+") factor)*
-Expr eterm() {
-    Expr exp = efactor();
+Expr eterm(HashTable* scope) {
+    Expr exp = efactor(scope);
     while (ematch(MINUS) || ematch(PLUS)) {
         Token operation = *eprevious();
-        Expr other = efactor();
+        Expr other = efactor(scope);
         if (other.type == ERROR) return other;
         if (exp.type == NUMBER && other.type == NUMBER) {
             float expNumber = strtof(exp.display, NULL);
@@ -182,11 +187,11 @@ Expr eterm() {
     return exp;
 }   
 // factor -> unary (("*" | "/") unary)*
-Expr efactor() {
-    Expr exp = eunary();
+Expr efactor(HashTable* scope) {
+    Expr exp = eunary(scope);
     while (ematch(STAR) || ematch(SLASH)) {
         Token operation = *eprevious();
-        Expr other = eunary();
+        Expr other = eunary(scope);
         if (other.type == ERROR) other;
         if (exp.type != NUMBER || other.type != NUMBER) {
             char* error_message = (char* ) malloc(55);
@@ -205,16 +210,16 @@ Expr efactor() {
 }
 
 // unary -> ("!" | "-") unary | primary
-Expr eunary() {
+Expr eunary(HashTable* scope) {
     if (ematch(BANG)) {
-        Expr exp = eunary();
+        Expr exp = eunary(scope);
         if (exp.type == ERROR) return exp;
         if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE, exp.line);
         return create_expr("false", FALSE, exp.line);
 
     }
     if (ematch(MINUS)) {
-        Expr exp = eunary();
+        Expr exp = eunary(scope);
         if (exp.type == ERROR) return exp;
         if (exp.type != NUMBER) {
             char* error_message = (char* ) malloc(50);
@@ -228,11 +233,11 @@ Expr eunary() {
         sprintf(newDisplay, "%.7g", -thatNumber);
         return create_expr(newDisplay, NUMBER,exp.line);
     }
-    return eprimary();
+    return eprimary(scope);
 }
 
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-Expr eprimary() {
+Expr eprimary(HashTable* scope) {
     if (ematch(STRING) || ematch(TRUE) || ematch(FALSE) ||
         ematch(NIL)) {
             return create_expr(eprevious()->lexeme,eprevious()->type,eprevious()->line);
@@ -245,7 +250,7 @@ Expr eprimary() {
     }
     else if (ematch(IDENTIFIER)) {
         char* var_name = eprevious()->lexeme;
-        Expr var_value = lookup(evariables, var_name);
+        Expr var_value = lookup(scope, var_name);
         if (var_value.line == -1) {
             char* error_message = (char* ) malloc(50 + strlen(var_name));
             sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", var_name, epeek()->line);
@@ -254,16 +259,16 @@ Expr eprimary() {
         }
 
         else if (ematch(EQUAL)) {
-            Expr new_value = eexpression();
+            Expr new_value = eexpression(scope);
             if (new_value.type == ERROR) return new_value;
-            insert(evariables, var_name, new_value);
+            insert(scope, var_name, new_value);
             return new_value;
         }
 
         return var_value;
     }
     else if (ematch(PRINT)) {
-        Expr to_print = eexpression();
+        Expr to_print = eexpression(scope);
         if (to_print.type == ERROR) return to_print;
         printf("%s\n", to_print.display);
         return to_print;
@@ -273,19 +278,19 @@ Expr eprimary() {
             char* variable_name = eprevious()->lexeme;
             Expr new_variable;
             if (ematch(EQUAL)) {
-                new_variable = eexpression();
+                new_variable = eexpression(scope);
                 if (new_variable.type == ERROR) return new_variable;
-                insert(evariables, variable_name, new_variable);
+                insert(scope, variable_name, new_variable);
             }
             else {
                 new_variable = create_expr("nil",NIL,epeek()->line);
-                insert(evariables, variable_name, new_variable);
+                insert(scope, variable_name, new_variable);
             }
             return new_variable;
         }
     }
     else if (ematch(LEFT_PAREN)) {
-        Expr exp = eexpression();
+        Expr exp = eexpression(scope);
         if (exp.type == ERROR) return exp;
         if (ematch(RIGHT_PAREN))
         return exp;
