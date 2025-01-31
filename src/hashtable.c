@@ -53,6 +53,24 @@ void destroy_scope(HashTable* scope) {
     free(scope);           // Free the scope itself
 }
 
+Expr* obtain(HashTable* ht, const char* key) {
+    while (ht) {
+        unsigned int index = hash(key);
+        Pair* pair = ht->table[index];
+
+        while (pair) {
+            if (strcmp(pair->key, key) == 0) {
+                return &(pair->value);
+            }
+            pair = pair->next;
+        }
+
+        ht = ht->parent;
+    }
+
+    return NULL;
+}
+
 Expr lookup(HashTable* ht, const char* key) {
     while (ht) {
         unsigned int index = hash(key);

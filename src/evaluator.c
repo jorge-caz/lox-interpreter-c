@@ -250,8 +250,8 @@ Expr eprimary(HashTable* scope) {
     }
     else if (ematch(IDENTIFIER)) {
         char* var_name = eprevious()->lexeme;
-        Expr var_value = lookup(scope, var_name);
-        if (var_value.line == -1) {
+        Expr* var_value = obtain(scope, var_name);
+        if (var_value == NULL) {
             char* error_message = (char* ) malloc(50 + strlen(var_name));
             sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", var_name, epeek()->line);
             *ecurrent = -1;
@@ -261,11 +261,14 @@ Expr eprimary(HashTable* scope) {
         else if (ematch(EQUAL)) {
             Expr new_value = eexpression(scope);
             if (new_value.type == ERROR) return new_value;
-            insert(scope, var_name, new_value);
-            return new_value;
+            var_value->display = new_value.display;
+            var_value->line = new_value.line;
+            var_value->type = new_value.type;
+            //insert(scope, var_name, new_value);
+            return (*var_value);
         }
 
-        return var_value;
+        return (*var_value);
     }
     else if (ematch(PRINT)) {
         Expr to_print = eexpression(scope);
