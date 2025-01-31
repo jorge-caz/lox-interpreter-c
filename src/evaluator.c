@@ -262,22 +262,22 @@ Expr eprimary() {
 
         return var_value;
     }
-    else if (rmatch(PRINT)) {
+    else if (ematch(PRINT)) {
         Expr to_print = eexpression();
         if (to_print.type == ERROR) return to_print;
         printf("%s\n", to_print.display);
         return to_print;
         }
-    else if (rmatch(VAR)) {
-        if (rmatch(IDENTIFIER)) {
+    else if (ematch(VAR)) {
+        if (ematch(IDENTIFIER)) {
             char* variable_name = eprevious()->lexeme;
             Expr new_variable;
-            if (rmatch(EQUAL)) {
+            if (ematch(EQUAL)) {
                 new_variable = eexpression();
                 if (new_variable.type == ERROR) return new_variable;
                 insert(evariables, variable_name, new_variable);
             }
-            else if (rmatch(TYPE_EOF)) {
+            else if (ematch(TYPE_EOF)) {
                 new_variable = create_expr("nil",NIL,epeek()->line);
                 insert(evariables, variable_name, new_variable);
             }
