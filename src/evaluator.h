@@ -15,7 +15,7 @@ typedef struct Pair {
     struct Pair* next;
 } Pair;
 
-typedef struct {
+typedef struct HashTable {
     Pair* table[TABLE_SIZE];
     struct HashTable* parent;
 } HashTable;
