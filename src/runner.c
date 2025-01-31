@@ -53,49 +53,43 @@ Token* next() {
     return scan_tokens(program, rerror);
 } //changes is so now we are reading the next command
 
-// returns expr.line=-1 if not assignment
-//assignment -> (identifier '=')* expression; 
-//assignment -> identifier '=' (assignment | expression);
-// Expr rassignment(HashTable* ht) {
-//     if (rmatch(IDENTIFIER)) {
-//         char* variable_name = rprevious()->lexeme;
+int validate_braces(Token* tokens) {
+    int depth = 0;  // Tracks the current nesting level
+    int i = 0;
 
-//         if (rmatch(EQUAL)) {
-//             int at_peek = curr;
-//             Expr other = eexpression();
-//             curr = at_peek;
+    while (tokens[i].type != TYPE_EOF) {  
+        if (tokens[i].type == LEFT_BRACE) {
+            depth++;  // Entering a new block
+        }
+        if (tokens[i].type == RIGHT_BRACE) {
+            depth--;  // Exiting a block
 
-//             if (other.type == ERROR)
-//             other = rassignment(ht);
-            
-//             if (other.type == ERROR || other.line == -1)
-//             return create_expr("nil", NIL, -1);
+            // If depth goes negative, a '}' appeared before a matching '{'
+            if (depth < 0) {
+                fprintf(stderr, "[line %d] Error at end: Expect '}'.\n", tokens[i].line);
+                exit(65);
+                return 0;  // Return false (invalid)
+            }
+        }
+        i++;  // Move to the next token
+    }
 
-//             Expr at_variable = lookup(ht,variable_name);
-//             if (at_variable.line==-1); //error! variable hasn't been declared
-//             insert(ht, variable_name, other);
-//             return other;
-//         }
-//     }
-//     return create_expr("nil", NIL, -1);
-// }
+    // If depth is not zero at the end, we have an unclosed block
+    if (depth != 0) {
+        fprintf(stderr, "[line %d] Error at end: Expect '}'.\n", tokens[i].line);
+        exit(65);
+        return 0;  // Return false (invalid)
+    }
 
-// code -> statement*;
-// statement -> simple_statement | '{' statement* '}';
-// simple_statement -> expression ';';
-// expression -> equality;
-// equality -> comparison (("!=" | "==") comparison)*;
-// comparison -> term ((">" | ">=" | "<" | "<=") term)*;
-// term -> factor (("-" | "+") factor)*;
-// factor -> unary (("*" | "/") unary)*;
-// unary -> ("!" | "-") unary | primary;
-// primary -> command | IDENTIFIER | NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")";
-// command -> PRINT expression | VAR IDENTIFIER = expression;
+    return 1;  // Return true (valid)
+}
+
 
 void run(char* input, int* error, HashTable* ht) {
     HashTable* variable_expressions = ht;
     rerror = error;
     current_tokens = scan_tokens(input, error);
+    validate_braces(current_tokens);
     einitialize(&current_tokens, error, &curr, variable_expressions);
     Expr to_compute = ecode();
     if (to_compute.type == ERROR) {
