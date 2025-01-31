@@ -277,7 +277,7 @@ Expr eprimary() {
                 if (new_variable.type == ERROR) return new_variable;
                 insert(evariables, variable_name, new_variable);
             }
-            else if (ematch(TYPE_EOF)) {
+            else {
                 new_variable = create_expr("nil",NIL,epeek()->line);
                 insert(evariables, variable_name, new_variable);
             }
