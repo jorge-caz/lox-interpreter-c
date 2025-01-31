@@ -45,6 +45,50 @@ int ematch(TokenType type) {
     return 0;
 }
 
+
+
+// code -> block*
+Expr ecode() {
+    while (!eis_at_end()) {
+        Expr bl = eblock();
+        if (epeek()->type == RIGHT_BRACE)
+        return create_expr("nil", NIL, -1);
+        if (bl.type == ERROR) return bl;
+    }
+    return create_expr("nil", NIL, -1);
+}
+
+// block -> statement | '{' block* '}'
+Expr eblock() {
+    if (ematch(LEFT_BRACE)) {
+        Expr cod = ecode();
+        if (cod.type == ERROR) return cod;
+        if (ematch(RIGHT_BRACE)) return create_expr("nil", NIL, -1);
+        
+        char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
+        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        *ecurrent = -1;
+        return create_expr(error_message, ERROR, 65);
+    }
+    Expr stat = estatement();
+    if (stat.type == ERROR) return stat;
+    return create_expr("nil", NIL, -1);
+
+}
+
+// statement -> expression ';';
+Expr estatement() {
+    Expr expre = eexpression();
+    if (expre.type == ERROR) return expre;
+    if (!ematch(SEMICOLON)) {
+        char* error_message = (char* ) malloc(55 + strlen(epeek()->lexeme));
+        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", epeek()->line, epeek()->lexeme);
+        *ecurrent = -1;
+        return create_expr(error_message, ERROR, 65);
+    }
+    return create_expr("nil", NIL, -1);
+}
+
 // expression -> equality
 Expr eexpression() {
     return eequality();
@@ -217,6 +261,28 @@ Expr eprimary() {
         }
 
         return var_value;
+    }
+    else if (rmatch(PRINT)) {
+        Expr to_print = eexpression();
+        if (to_print.type == ERROR) return to_print;
+        printf("%s\n", to_print.display);
+        return to_print;
+        }
+    else if (rmatch(VAR)) {
+        if (rmatch(IDENTIFIER)) {
+            char* variable_name = eprevious()->lexeme;
+            Expr new_variable;
+            if (rmatch(EQUAL)) {
+                new_variable = eexpression();
+                if (new_variable.type == ERROR) return new_variable;
+                insert(evariables, variable_name, new_variable);
+            }
+            else if (rmatch(TYPE_EOF)) {
+                new_variable = create_expr("nil",NIL,epeek()->line);
+                insert(evariables, variable_name, new_variable);
+            }
+            return new_variable;
+        }
     }
     else if (ematch(LEFT_PAREN)) {
         Expr exp = eexpression();

@@ -80,60 +80,36 @@ Token* next() {
 //     return create_expr("nil", NIL, -1);
 // }
 
+// code -> statement*;
+// statement -> simple_statement | '{' statement* '}';
+// simple_statement -> expression ';';
+// expression -> equality;
+// equality -> comparison (("!=" | "==") comparison)*;
+// comparison -> term ((">" | ">=" | "<" | "<=") term)*;
+// term -> factor (("-" | "+") factor)*;
+// factor -> unary (("*" | "/") unary)*;
+// unary -> ("!" | "-") unary | primary;
+// primary -> command | IDENTIFIER | NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")";
+// command -> PRINT expression | VAR IDENTIFIER = expression;
 
 void run(char* input, int* error, HashTable* ht) {
     HashTable* variable_expressions = ht;
     rerror = error;
-    current_tokens = tokenize_by_command(input);
+    current_tokens = scan_tokens(input, error);
     einitialize(&current_tokens, error, &curr, variable_expressions);
-    while (next_index != NULL) {
-        if (rmatch(PRINT)) {
-            Expr to_print = eexpression();
-            if (to_print.type == ERROR) {
-                fprintf(stderr, "%s", to_print.display);
-                exit(to_print.line);
-            }
-            printf("%s\n", to_print.display);
-        }
-        else if (rmatch(VAR)) {
-            if (rmatch(IDENTIFIER)) {
-                char* variable_name = rprevious()->lexeme;
-                if (rmatch(EQUAL)) {
-                    Expr new_variable = eexpression();
-                    if (new_variable.type == ERROR) {
-                        fprintf(stderr, "%s", new_variable.display);
-                        exit(new_variable.line);
-                    }
-                    insert(variable_expressions, variable_name, new_variable);
-                }
-                else if (rmatch(TYPE_EOF)) {
-                    Expr new_variable = create_expr("nil",NIL,rpeek()->line);
-                    insert(variable_expressions, variable_name, new_variable);
-                }
-            }
-        }
-        // else if (rpeek()->type == IDENTIFIER) {
-        //     Expr success = rassignment(variable_expressions);
-        //     if (success.line == -1) {
-        //        Expr compute = eexpression(); 
-        //        if (compute.type == ERROR) {
-        //             fprintf(stderr, "%s", compute.display);
-        //             exit(compute.line);
-        //         }
-        //     }
-            
-            
-        //     //assignment -> (identifier '=')* expression; 
-        // }
-        else {
-            Expr to_compute = eexpression();
-            if (to_compute.type == ERROR) {
-                    fprintf(stderr, "%s", to_compute.display);
-                    exit(to_compute.line);
-                }
-        }
-        current_tokens = next();
-        if (current_tokens == NULL) break;
-        einitialize(&current_tokens, error, &curr, variable_expressions);
+    Expr to_compute = ecode();
+    if (to_compute.type == ERROR) {
+        fprintf(stderr, "%s", to_compute.display);
+        exit(to_compute.line);
     }
+    // while (next_index != NULL) {
+    //     Expr to_compute = eexpression();
+    //     if (to_compute.type == ERROR) {
+    //             fprintf(stderr, "%s", to_compute.display);
+    //             exit(to_compute.line);
+    //         }
+    //     current_tokens = next();
+    //     if (current_tokens == NULL) break;
+    //     einitialize(&current_tokens, error, &curr, variable_expressions);
+    // }
 }

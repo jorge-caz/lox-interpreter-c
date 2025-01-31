@@ -32,6 +32,9 @@ int eis_at_end();
 int ematch(TokenType type);
 void einitialize(Token** tokens, int* error, int* current, HashTable* ht);
 
+Expr ecode();
+Expr eblock();
+Expr estatement();
 Expr eexpression();
 Expr eequality();
 Expr ecomparison();
