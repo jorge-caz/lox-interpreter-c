@@ -4,49 +4,49 @@
 #include "scanner.h"
 #include "parser.h"
 
-Token* tokenList;
-int current = 0;
-int* err;
+Token* ptokenList;
+int pcurrent = 0;
+int* perr;
 
-void initialize(Token** tokens, int* error) {
-    tokenList = *tokens; err = error;
-}
-
-Token* peek() {
-    return &tokenList[current];
-}
-Token* advance() {
-    if (!is_at_end()) current++;
-    return peek();
-}
-Token* previous() {
-    if (current == 0) return peek();
-    return &tokenList[current-1];
+void pinitialize(Token** tokens, int* error) {
+    ptokenList = *tokens; perr = error;
 }
 
-int is_at_end() {
-    return peek()->type == TYPE_EOF;
+Token* ppeek() {
+    return &ptokenList[pcurrent];
+}
+Token* padvance() {
+    if (!pis_at_end()) pcurrent++;
+    return ppeek();
+}
+Token* pprevious() {
+    if (pcurrent == 0) return ppeek();
+    return &ptokenList[pcurrent-1];
 }
 
-int match(TokenType type) {
-    if (peek()->type == type) {
-        advance();
+int pis_at_end() {
+    return ppeek()->type == TYPE_EOF;
+}
+
+int pmatch(TokenType type) {
+    if (ppeek()->type == type) {
+        padvance();
         return 1;
     }
     return 0;
 }
 
-// expression -> equality
-char* expression() {
-    return equality();
+// pexpression -> pequality
+char* pexpression() {
+    return pequality();
 }
 
-// equality -> comparison (("!=" | "==") comparison)*
-char* equality() {
-    char* exp = comparison();
-    while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
-        Token operation = *previous();
-        char* other = comparison();
+// pequality -> pcomparison (("!=" | "==") pcomparison)*
+char* pequality() {
+    char* exp = pcomparison();
+    while (pmatch(BANG_EQUAL) || pmatch(EQUAL_EQUAL)) {
+        Token operation = *pprevious();
+        char* other = pcomparison();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 7);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
@@ -57,13 +57,13 @@ char* equality() {
     return exp;
 }
 
-// comparison -> term ((">" | ">=" | "<" | "<=") term)*
-char* comparison() {
-    char* exp = term();
-    while (match(GREATER) || match(GREATER_EQUAL) ||
-            match(LESS) || match(LESS_EQUAL)) {
-        Token operation = *previous();
-        char* other = term();
+// pcomparison -> pterm ((">" | ">=" | "<" | "<=") pterm)*
+char* pcomparison() {
+    char* exp = pterm();
+    while (pmatch(GREATER) || pmatch(GREATER_EQUAL) ||
+            pmatch(LESS) || pmatch(LESS_EQUAL)) {
+        Token operation = *pprevious();
+        char* other = pterm();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + strlen(operation.lexeme) + 5);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
@@ -74,12 +74,12 @@ char* comparison() {
     return exp;
 }
 
-// term -> factor (("-" | "+") factor)*
-char* term() {
-    char* exp = factor();
-    while (match(MINUS) || match(PLUS)) {
-        Token operation = *previous();
-        char* other = factor();
+// pterm -> pfactor (("-" | "+") pfactor)*
+char* pterm() {
+    char* exp = pfactor();
+    while (pmatch(MINUS) || pmatch(PLUS)) {
+        Token operation = *pprevious();
+        char* other = pfactor();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
@@ -90,12 +90,12 @@ char* term() {
     return exp;
 }
 
-// factor -> unary (("*" | "/") unary)*
-char* factor() {
-    char* exp = unary();
-    while (match(STAR) || match(SLASH)) {
-        Token operation = *previous();
-        char* other = unary();
+// pfactor -> punary (("*" | "/") punary)*
+char* pfactor() {
+    char* exp = punary();
+    while (pmatch(STAR) || pmatch(SLASH)) {
+        Token operation = *pprevious();
+        char* other = punary();
         char* val = (char* ) malloc(strlen(exp) + strlen(other) + 6);
         sprintf(val, "(%s %s %s)", operation.lexeme, exp, other);
 
@@ -106,35 +106,35 @@ char* factor() {
     return exp;
 }
 
-// unary -> ("!" | "-") unary | primary
-char* unary() {
-    if (match(BANG) || match(MINUS)) {
-        Token operation = *previous();
-        char* exp = unary();
+// punary -> ("!" | "-") punary | pprimary
+char* punary() {
+    if (pmatch(BANG) || pmatch(MINUS)) {
+        Token operation = *pprevious();
+        char* exp = punary();
         char* value = (char* ) malloc(strlen(exp) + 4);
         sprintf(value, "(%s %s)", operation.lexeme, exp);
         
         free(exp);
         return value;
     }
-    return primary();
+    return pprimary();
 }
 
-// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-char* primary() {
-    if (match(NUMBER) || match(STRING) || match(TRUE) || match(FALSE) ||
-        match(NIL)) {
-            return strdup(previous()->lexeme);
+// pprimary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" pexpression ")"
+char* pprimary() {
+    if (pmatch(NUMBER) || pmatch(STRING) || pmatch(TRUE) || pmatch(FALSE) ||
+        pmatch(NIL)) {
+            return strdup(pprevious()->lexeme);
         }
-    else if (match(LEFT_PAREN)) {
-        char* exp = expression();
+    else if (pmatch(LEFT_PAREN)) {
+        char* exp = pexpression();
         char* value = (char* ) malloc(strlen(exp) + 9);
-        if (match(RIGHT_PAREN))
+        if (pmatch(RIGHT_PAREN))
         sprintf(value, "(group %s)", exp);
         else {
-            *err = 1;
+            *perr = 1;
             free(exp);
-            fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
+            fprintf(stderr, "[line %d] Error at '%s': Expect pexpression.", ppeek()->line, ppeek()->lexeme);
             exit(65);
         }
 
@@ -142,9 +142,9 @@ char* primary() {
         return value;
     } 
     else {
-        *err = 1;
-        fprintf(stderr, "%s", previous()->lexeme);
-        fprintf(stderr, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
+        *perr = 1;
+        fprintf(stderr, "%s", pprevious()->lexeme);
+        fprintf(stderr, "[line %d] Error at '%s': Expect pexpression.", ppeek()->line, ppeek()->lexeme);
         exit(65);
     }
     return "";

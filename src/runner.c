@@ -5,7 +5,6 @@
 #include "scanner.h"
 #include "evaluator.h"
 
-char* program;
 char* next_index;
 int* rerror;
 int curr = 0;
@@ -35,23 +34,6 @@ int rmatch(TokenType type) {
     }
     return 0;
 }
-
-//it initializes the variables, and now the input only reads the first command until ;
-Token* tokenize_by_command(char* input) {
-    next_index = strchr(input, ';');
-    if (next_index == NULL) fprintf(stderr, "Expected a semicolon\n");
-    program = input;
-    *next_index = '\0'; next_index++;
-    return scan_tokens(program, rerror);
-}
-Token* next() {
-    program = next_index;
-    next_index = strchr(program, ';');
-    if (next_index == NULL) return NULL;
-    *next_index = '\0'; next_index++;
-    curr = 0;
-    return scan_tokens(program, rerror);
-} //changes is so now we are reading the next command
 
 int validate_braces(Token* tokens) {
     int depth = 0;  // Tracks the current nesting level
@@ -90,9 +72,9 @@ void run(char* input, int* error, HashTable* ht) {
     rerror = error;
     current_tokens = scan_tokens(input, error);
     validate_braces(current_tokens);
-    einitialize(&current_tokens, error, &curr, variable_expressions);
+    initialize(&current_tokens, error, &curr, variable_expressions);
     HashTable* global_scope = create_scope(NULL);
-    Expr to_compute = ecode(global_scope);
+    Expr to_compute = program(global_scope);
     if (to_compute.type == ERROR) {
         fprintf(stderr, "%s", to_compute.display);
         exit(to_compute.line);

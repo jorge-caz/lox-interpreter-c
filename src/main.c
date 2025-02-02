@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
 
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
-            initialize(&tokens, &error);
-            char* exp = expression();
+            pinitialize(&tokens, &error);
+            char* exp = pexpression();
             if (!error)
             printf("%s", exp);
         }
@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
         if (strlen(file_contents) > 0) {
             tokens = scan_tokens(file_contents, &error);
             int curr = 0;
-            einitialize(&tokens, &error, &curr, &variables);
+            initialize(&tokens, &error, &curr, &variables);
             HashTable* global_scope = create_scope(NULL);
-            Expr exp = eexpression(global_scope);
+            Expr exp = expression(global_scope);
             if (exp.type == ERROR) {
                 fprintf(stderr, "%s", exp.display);
                 exit(exp.line);
