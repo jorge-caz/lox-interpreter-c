@@ -4,16 +4,21 @@
 #include "scanner.h"
 #include "evaluator.h"
 
-Token* tokenList;
-int* current;
-int* err;
-HashTable* variables;
+Token *tokenList;
+int *current;
+int *err;
+HashTable *variables;
 
-void initialize(Token** tokens, int* error, int* curr, HashTable* ht) {
-    tokenList = *tokens; err = error; current = curr; variables = ht;
+void initialize(Token **tokens, int *error, int *curr, HashTable *ht)
+{
+    tokenList = *tokens;
+    err = error;
+    current = curr;
+    variables = ht;
 }
 
-Expr create_expr(const char* display, TokenType type, int line) {
+Expr create_expr(const char *display, TokenType type, int line)
+{
     Expr expr;
     expr.display = display;
     expr.type = type;
@@ -21,115 +26,144 @@ Expr create_expr(const char* display, TokenType type, int line) {
     return expr;
 }
 
-Token* peek() {
+Token *peek()
+{
     return &tokenList[*current];
 }
-Token* advance() {
-    if (!is_at_end()) (*current)++;
+Token *advance()
+{
+    if (!is_at_end())
+        (*current)++;
     return peek();
 }
-Token* previous() {
-    if (*current == 0) return peek();
-    return &tokenList[(*current)-1];
+Token *previous()
+{
+    if (*current == 0)
+        return peek();
+    return &tokenList[(*current) - 1];
 }
 
-Token* next() {
-    if (is_at_end()) return NULL;
-    return &tokenList[(*current)+1];
+Token *next()
+{
+    if (is_at_end())
+        return NULL;
+    return &tokenList[(*current) + 1];
 }
 
-int is_at_end() {
+int is_at_end()
+{
     return (peek()->type == TYPE_EOF && *current >= 0);
 }
 
-int is_type(TokenType type) {
+int is_type(TokenType type)
+{
     return peek()->type == type;
 }
 
-int next_is_type(TokenType type) {
-    if (next() == NULL) return 0;
+int next_is_type(TokenType type)
+{
+    if (next() == NULL)
+        return 0;
     return next()->type == type;
 }
 
-int match(TokenType type) {
-    if (peek()->type == type) {
+int match(TokenType type)
+{
+    if (peek()->type == type)
+    {
         advance();
         return 1;
     }
     return 0;
 }
 
-
-void code_mover() {
-    while (!is_at_end()) {
+void code_mover()
+{
+    while (!is_at_end())
+    {
         block_mover();
         if (peek()->type == RIGHT_BRACE)
-        return;
+            return;
     }
     return;
 }
 
 // block -> statement | '{' block* '}'
-void block_mover() {
-    if (match(LEFT_BRACE)) {
+void block_mover()
+{
+    if (match(LEFT_BRACE))
+    {
         code_mover();
-        if (match(RIGHT_BRACE)) return;
+        if (match(RIGHT_BRACE))
+            return;
     }
     statement_mover();
     return;
-
 }
 
 // statement -> expression ';';
-void statement_mover() {
+void statement_mover()
+{
     expression_mover();
-    if (match(SEMICOLON)) return; 
+    if (match(SEMICOLON))
+        return;
     return;
 }
 
 // expression -> equality
-void expression_mover() {
+void expression_mover()
+{
     equality_mover();
 }
 
 // equality -> comparison (("!=" | "==") comparison)*
-void equality_mover() {
+void equality_mover()
+{
     comparison_mover();
-    while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
+    while (match(BANG_EQUAL) || match(EQUAL_EQUAL))
+    {
         comparison_mover();
     }
     return;
 }
 
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
-void comparison_mover() {
+void comparison_mover()
+{
     term_mover();
-    while (match(GREATER) || match(GREATER_EQUAL) || match(LESS) || match(LESS_EQUAL)) {
+    while (match(GREATER) || match(GREATER_EQUAL) || match(LESS) || match(LESS_EQUAL))
+    {
         term_mover();
     }
     return;
 }
 
 // term -> factor (("-" | "+") factor)*
-void term_mover() {
+void term_mover()
+{
     factor_mover();
-    while (match(MINUS) || match(PLUS)) {
+    while (match(MINUS) || match(PLUS))
+    {
         factor_mover();
     }
     return;
-}   
+}
 // factor -> unary (("*" | "/") unary)*
-void factor_mover() {
+void factor_mover()
+{
     unary_mover();
-    while (match(STAR) || match(SLASH)) {
+    while (match(STAR) || match(SLASH))
+    {
         unary_mover();
     }
     return;
 }
 
 // unary -> ("!" | "-") unary | primary
-void unary_mover() {
-    if (match(BANG) || match(MINUS)) {
+void unary_mover()
+{
+    if (match(BANG) || match(MINUS))
+    {
         unary_mover();
         return;
     }
@@ -138,134 +172,170 @@ void unary_mover() {
 }
 
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-void primary_mover() {
+void primary_mover()
+{
     if (match(STRING) || match(TRUE) || match(FALSE) ||
-        match(NIL) || match(NUMBER)) {
-            return;
-        }
-    else if (match(IDENTIFIER)) {
-        if (match(EQUAL)) expression_mover();
+        match(NIL) || match(NUMBER))
+    {
         return;
     }
-    else if (match(PRINT)) {
+    else if (match(IDENTIFIER))
+    {
+        if (match(EQUAL))
+            expression_mover();
+        return;
+    }
+    else if (match(PRINT))
+    {
         expression_mover();
         return;
-        }
-    else if (match(VAR)) {
-        if (match(IDENTIFIER)) {
-            if (match(EQUAL)) expression_mover();
+    }
+    else if (match(VAR))
+    {
+        if (match(IDENTIFIER))
+        {
+            if (match(EQUAL))
+                expression_mover();
             return;
         }
     }
-    else if (match(IF)) {
-        expression_mover(); block_mover();
+    else if (match(IF))
+    {
+        expression_mover();
+        block_mover();
     }
-    else if (match(LEFT_PAREN)) {
+    else if (match(LEFT_PAREN))
+    {
         expression_mover();
         match(RIGHT_PAREN);
         return;
-    } 
+    }
     return;
 }
 
-
-// program -> declaration* EOF ; 
+// program -> declaration* EOF ;
 // declaration -> varDecl | statement;
-// varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ; 
+// varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 // statement -> exprStmt | ifStmt | printStmt | block;
-// block -> "{" declaration* "}" 
+// block -> "{" declaration* "}"
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
-// exprStmt -> expression ";" ; 
+// exprStmt -> expression ";" ;
 // printStmt  -> "print" expression ";" ;
-// expression -> assignment ; 
+// expression -> assignment ;
 // assignment -> IDENTIFIER "=" assignment | equality ;
 
-Expr program(HashTable* scope) {
-    while (!is_at_end()) {
+Expr program(HashTable *scope)
+{
+    while (!is_at_end())
+    {
         Expr bl = declaration(scope);
-        if (bl.type == ERROR) return bl;
+        if (bl.type == ERROR)
+            return bl;
     }
     return create_expr("nil", NIL, -1);
 }
 
 // declaration -> varDecl | statement;
-Expr declaration(HashTable* scope) {
-    //varDecl starts with "var"
-    if (is_type(VAR)) return varDecl(scope);
+Expr declaration(HashTable *scope)
+{
+    // varDecl starts with "var"
+    if (is_type(VAR))
+        return varDecl(scope);
     return statement(scope);
 }
 
-Expr varDecl(HashTable* scope) {
-    // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ; 
-    if (match(VAR)) {
-        if (match(IDENTIFIER)) {
-            char* variable_name = previous()->lexeme;
+Expr varDecl(HashTable *scope)
+{
+    // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+    if (match(VAR))
+    {
+        if (match(IDENTIFIER))
+        {
+            char *variable_name = previous()->lexeme;
             Expr new_variable;
-            if (match(EQUAL)) {
+            if (match(EQUAL))
+            {
                 new_variable = expression(scope);
-                if (new_variable.type == ERROR) return new_variable;
+                if (new_variable.type == ERROR)
+                    return new_variable;
                 insert(scope, variable_name, new_variable);
-                Expr* found = obtain(scope, variable_name);
+                Expr *found = obtain(scope, variable_name);
             }
-            else {
-                new_variable = create_expr("nil",NIL,peek()->line);
+            else
+            {
+                new_variable = create_expr("nil", NIL, peek()->line);
                 insert(scope, variable_name, new_variable);
             }
-            if (match(SEMICOLON)) return new_variable;
+            if (match(SEMICOLON))
+                return new_variable;
         }
     }
-    char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
     sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
 
 // statement -> exprStmt | printStmt | block;
-Expr statement(HashTable* scope) {
-    if (is_type(PRINT)) return printStmt(scope);
-    else if (is_type(LEFT_BRACE)) return block(scope);
-    else if (is_type(IF)) return ifStmt(scope);
+Expr statement(HashTable *scope)
+{
+    if (is_type(PRINT))
+        return printStmt(scope);
+    else if (is_type(LEFT_BRACE))
+        return block(scope);
+    else if (is_type(IF))
+        return ifStmt(scope);
     return exprStmt(scope);
 }
 
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
-Expr ifStmt(HashTable* scope) {
-    if (matches(IF)) {
-        if (matches(LEFT_PAREN)) {
+Expr ifStmt(HashTable *scope)
+{
+    if (match(IF))
+    {
+        if (match(LEFT_PAREN))
+        {
             Expr condition = expression(scope);
-            if (!matches(RIGHT_BRACE)); //error
-            
+            if (!match(RIGHT_BRACE))
+                ; // error
         }
     }
 }
 
-// block -> "{" declaration* "}" 
-Expr block(HashTable* scope) {
-    if (match(LEFT_BRACE)) {
-        HashTable* newScope = create_scope(scope);
-        while (!is_at_end()) {
-        
+// block -> "{" declaration* "}"
+Expr block(HashTable *scope)
+{
+    if (match(LEFT_BRACE))
+    {
+        HashTable *newScope = create_scope(scope);
+        while (!is_at_end())
+        {
+
             Expr bl = declaration(newScope);
 
-            if (match(RIGHT_BRACE)) {
+            if (match(RIGHT_BRACE))
+            {
                 destroy_scope(newScope);
                 return bl;
             }
-            
-            if (bl.type == ERROR) return bl;
+
+            if (bl.type == ERROR)
+                return bl;
         }
     }
-    char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
     sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
 
-// exprStmt -> expression ";" ; 
-Expr exprStmt(HashTable* scope) {
+// exprStmt -> expression ";" ;
+Expr exprStmt(HashTable *scope)
+{
     Expr expr = expression(scope);
-    if (!match(SEMICOLON)) {
-        char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+    if (!match(SEMICOLON))
+    {
+        char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
         sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
         *current = -1;
         return create_expr(error_message, ERROR, 65);
@@ -273,12 +343,16 @@ Expr exprStmt(HashTable* scope) {
     return expr;
 }
 // printStmt  -> "print" expression ";" ;
-Expr printStmt(HashTable* scope) {
-    if (match(PRINT)) {
+Expr printStmt(HashTable *scope)
+{
+    if (match(PRINT))
+    {
         Expr to_print = expression(scope);
-        if (to_print.type == ERROR) return to_print;
-        if (!match(SEMICOLON)) {
-            char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+        if (to_print.type == ERROR)
+            return to_print;
+        if (!match(SEMICOLON))
+        {
+            char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
             sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
             *current = -1;
             return create_expr(error_message, ERROR, 65);
@@ -286,45 +360,50 @@ Expr printStmt(HashTable* scope) {
         printf("%s\n", to_print.display);
         return to_print;
     }
-    char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
     sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
 
 // statement -> exprStmt | printStmt | block;
-// block -> "{" declaration* "}" 
-// exprStmt -> expression ";" ; 
+// block -> "{" declaration* "}"
+// exprStmt -> expression ";" ;
 // printStmt  -> "print" expression ";" ;
-// expression -> assignment ; 
+// expression -> assignment ;
 // assignment -> IDENTIFIER "=" assignment | equality ;
 
-
-// expression -> assignment ; 
-Expr expression(HashTable* scope) {
+// expression -> assignment ;
+Expr expression(HashTable *scope)
+{
     return assignment(scope);
 }
 
 // assignment -> IDENTIFIER "=" assignment | equality ;
-Expr assignment(HashTable* scope) {
-    if (is_type(IDENTIFIER) && next_is_type(EQUAL)) {
+Expr assignment(HashTable *scope)
+{
+    if (is_type(IDENTIFIER) && next_is_type(EQUAL))
+    {
         advance();
-        char* var_name = previous()->lexeme;
-        Expr* var_value = obtain(scope, var_name);
-        if (var_value == NULL) {
-            char* error_message = (char* ) malloc(50 + strlen(var_name));
+        char *var_name = previous()->lexeme;
+        Expr *var_value = obtain(scope, var_name);
+        if (var_value == NULL)
+        {
+            char *error_message = (char *)malloc(50 + strlen(var_name));
             sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", var_name, peek()->line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
 
-        else if (match(EQUAL)) {
+        else if (match(EQUAL))
+        {
             Expr new_value = expression(scope);
-            if (new_value.type == ERROR) return new_value;
+            if (new_value.type == ERROR)
+                return new_value;
             var_value->display = new_value.display;
             var_value->line = new_value.line;
             var_value->type = new_value.type;
-            //insert(scope, var_name, new_value);
+            // insert(scope, var_name, new_value);
             return (*var_value);
         }
 
@@ -334,182 +413,229 @@ Expr assignment(HashTable* scope) {
 }
 
 // equality -> comparison (("!=" | "==") comparison)*
-Expr equality(HashTable* scope) {
+Expr equality(HashTable *scope)
+{
     Expr exp = comparison(scope);
     Expr last = exp;
-    while (match(BANG_EQUAL) || match(EQUAL_EQUAL)) {
+    while (match(BANG_EQUAL) || match(EQUAL_EQUAL))
+    {
         Token operation = *previous();
         Expr other = comparison(scope);
-        if (other.type == ERROR) other;
+        if (other.type == ERROR)
+            other;
         int val;
-        if (last.type != other.type) {
+        if (last.type != other.type)
+        {
             val = 0;
         }
-        else if (last.type == NUMBER && other.type == NUMBER) {
+        else if (last.type == NUMBER && other.type == NUMBER)
+        {
             float expNumber = strtof(last.display, NULL);
             float otherNumber = strtof(other.display, NULL);
             val = expNumber == otherNumber;
         }
-        else if (last.type == STRING && other.type == STRING) {
+        else if (last.type == STRING && other.type == STRING)
+        {
             val = strcmp(last.display, other.display) == 0;
         }
-        else val = 1;
+        else
+            val = 1;
         last = other;
-        if (operation.type == BANG_EQUAL) exp = create_expr(val?"false":"true", val?FALSE:TRUE, last.line);
-        else if (operation.type == EQUAL_EQUAL) exp = create_expr(val?"true":"false", val?TRUE:FALSE, last.line);
+        if (operation.type == BANG_EQUAL)
+            exp = create_expr(val ? "false" : "true", val ? FALSE : TRUE, last.line);
+        else if (operation.type == EQUAL_EQUAL)
+            exp = create_expr(val ? "true" : "false", val ? TRUE : FALSE, last.line);
     }
     return exp;
 }
 
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
-Expr comparison(HashTable* scope) {
+Expr comparison(HashTable *scope)
+{
     Expr exp = term(scope);
     Expr last = exp;
-    while (match(GREATER) || match(GREATER_EQUAL) || match(LESS) || match(LESS_EQUAL)) {
+    while (match(GREATER) || match(GREATER_EQUAL) || match(LESS) || match(LESS_EQUAL))
+    {
         Token operation = *previous();
         Expr other = term(scope);
-        if (other.type == ERROR) return other;
-        if (last.type != NUMBER || other.type != NUMBER) {
-            char* error_message = (char* ) malloc(50);
+        if (other.type == ERROR)
+            return other;
+        if (last.type != NUMBER || other.type != NUMBER)
+        {
+            char *error_message = (char *)malloc(50);
             sprintf(error_message, "Operands must be numbers.\n[line %d]\n", last.line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
-        if (exp.type == FALSE) continue;
+        if (exp.type == FALSE)
+            continue;
         float expNumber = strtof(last.display, NULL);
         float otherNumber = strtof(other.display, NULL);
         last = other;
-        
+
         int val;
-        if (operation.type == GREATER) val = expNumber > otherNumber;
-        else if (operation.type == GREATER_EQUAL) val = expNumber >= otherNumber;
-        else if (operation.type == LESS) val = expNumber < otherNumber;
-        else if (operation.type == LESS_EQUAL) val = expNumber <= otherNumber;
-        exp = create_expr(val?"true":"false", val?TRUE:FALSE, last.line);
+        if (operation.type == GREATER)
+            val = expNumber > otherNumber;
+        else if (operation.type == GREATER_EQUAL)
+            val = expNumber >= otherNumber;
+        else if (operation.type == LESS)
+            val = expNumber < otherNumber;
+        else if (operation.type == LESS_EQUAL)
+            val = expNumber <= otherNumber;
+        exp = create_expr(val ? "true" : "false", val ? TRUE : FALSE, last.line);
     }
     return exp;
 }
 
 // term -> factor (("-" | "+") factor)*
-Expr term(HashTable* scope) {
+Expr term(HashTable *scope)
+{
     Expr exp = factor(scope);
-    while (match(MINUS) || match(PLUS)) {
+    while (match(MINUS) || match(PLUS))
+    {
         Token operation = *previous();
         Expr other = factor(scope);
-        if (other.type == ERROR) return other;
-        if (exp.type == NUMBER && other.type == NUMBER) {
+        if (other.type == ERROR)
+            return other;
+        if (exp.type == NUMBER && other.type == NUMBER)
+        {
             float expNumber = strtof(exp.display, NULL);
             float otherNumber = strtof(other.display, NULL);
-            char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
-            if (operation.type == MINUS) sprintf(newDisplay, "%.7g", expNumber-otherNumber);
-            else if (operation.type == PLUS) sprintf(newDisplay, "%.7g", expNumber+otherNumber);
+            char *newDisplay = (char *)malloc(strlen(exp.display) + strlen(other.display) + 8);
+            if (operation.type == MINUS)
+                sprintf(newDisplay, "%.7g", expNumber - otherNumber);
+            else if (operation.type == PLUS)
+                sprintf(newDisplay, "%.7g", expNumber + otherNumber);
             exp = create_expr(newDisplay, NUMBER, other.line);
         }
-        else if (exp.type == STRING && other.type == STRING) {
-            if (operation.type == MINUS); //type error
-            char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 1);
+        else if (exp.type == STRING && other.type == STRING)
+        {
+            if (operation.type == MINUS)
+                ; // type error
+            char *newDisplay = (char *)malloc(strlen(exp.display) + strlen(other.display) + 1);
             sprintf(newDisplay, "%s%s", exp.display, other.display);
             exp = create_expr(newDisplay, STRING, other.line);
         }
-        else {
-            char* error_message = (char* ) malloc(70);
+        else
+        {
+            char *error_message = (char *)malloc(70);
             sprintf(error_message, "Operands must be two numbers or two strings.\n[line %d]\n", exp.line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
     }
     return exp;
-}   
+}
 // factor -> unary (("*" | "/") unary)*
-Expr factor(HashTable* scope) {
+Expr factor(HashTable *scope)
+{
     Expr exp = unary(scope);
-    while (match(STAR) || match(SLASH)) {
+    while (match(STAR) || match(SLASH))
+    {
         Token operation = *previous();
         Expr other = unary(scope);
-        if (other.type == ERROR) other;
-        if (exp.type != NUMBER || other.type != NUMBER) {
-            char* error_message = (char* ) malloc(55);
+        if (other.type == ERROR)
+            other;
+        if (exp.type != NUMBER || other.type != NUMBER)
+        {
+            char *error_message = (char *)malloc(55);
             sprintf(error_message, "Operands must be numbers.\n[line %d]\n", exp.line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
         float expNumber = strtof(exp.display, NULL);
         float otherNumber = strtof(other.display, NULL);
-        char* newDisplay = (char* ) malloc(strlen(exp.display) + strlen(other.display) + 8);
-        if (operation.type == STAR) sprintf(newDisplay, "%.7g", expNumber*otherNumber);
-        else if (operation.type == SLASH) sprintf(newDisplay, "%.7g", expNumber/otherNumber);
+        char *newDisplay = (char *)malloc(strlen(exp.display) + strlen(other.display) + 8);
+        if (operation.type == STAR)
+            sprintf(newDisplay, "%.7g", expNumber * otherNumber);
+        else if (operation.type == SLASH)
+            sprintf(newDisplay, "%.7g", expNumber / otherNumber);
         exp = create_expr(newDisplay, NUMBER, other.line);
     }
     return exp;
 }
 
 // unary -> ("!" | "-") unary | primary
-Expr unary(HashTable* scope) {
-    if (match(BANG)) {
+Expr unary(HashTable *scope)
+{
+    if (match(BANG))
+    {
         Expr exp = unary(scope);
-        if (exp.type == ERROR) return exp;
-        if (exp.type == FALSE || exp.type == NIL) return create_expr("true", TRUE, exp.line);
+        if (exp.type == ERROR)
+            return exp;
+        if (exp.type == FALSE || exp.type == NIL)
+            return create_expr("true", TRUE, exp.line);
         return create_expr("false", FALSE, exp.line);
-
     }
-    if (match(MINUS)) {
+    if (match(MINUS))
+    {
         Expr exp = unary(scope);
-        if (exp.type == ERROR) return exp;
-        if (exp.type != NUMBER) {
-            char* error_message = (char* ) malloc(50);
+        if (exp.type == ERROR)
+            return exp;
+        if (exp.type != NUMBER)
+        {
+            char *error_message = (char *)malloc(50);
             sprintf(error_message, "Operand must be a number.\n[line %d]\n", exp.line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
 
         float thatNumber = strtof(exp.display, NULL);
-        char* newDisplay = (char* ) malloc(strlen(exp.display) + 8);
+        char *newDisplay = (char *)malloc(strlen(exp.display) + 8);
         sprintf(newDisplay, "%.7g", -thatNumber);
-        return create_expr(newDisplay, NUMBER,exp.line);
+        return create_expr(newDisplay, NUMBER, exp.line);
     }
     return primary(scope);
 }
 
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-Expr primary(HashTable* scope) {
+Expr primary(HashTable *scope)
+{
     if (match(STRING) || match(TRUE) || match(FALSE) ||
-        match(NIL)) {
-            return create_expr(previous()->lexeme,previous()->type,previous()->line);
-        }
-    else if (match(NUMBER)) {
-        float thatNumber = strtof(previous()->lexeme, NULL);
-        char* newDisplay = (char* ) malloc(strlen(previous()->lexeme) + 8);
-        sprintf(newDisplay, "%.7g", thatNumber);
-        return create_expr(newDisplay, NUMBER,previous()->line);
+        match(NIL))
+    {
+        return create_expr(previous()->lexeme, previous()->type, previous()->line);
     }
-    else if (match(IDENTIFIER)) {
-        char* var_name = previous()->lexeme;
-        Expr* var_value = obtain(scope, var_name);
-        if (var_value == NULL) {
-            char* error_message = (char* ) malloc(50 + strlen(var_name));
+    else if (match(NUMBER))
+    {
+        float thatNumber = strtof(previous()->lexeme, NULL);
+        char *newDisplay = (char *)malloc(strlen(previous()->lexeme) + 8);
+        sprintf(newDisplay, "%.7g", thatNumber);
+        return create_expr(newDisplay, NUMBER, previous()->line);
+    }
+    else if (match(IDENTIFIER))
+    {
+        char *var_name = previous()->lexeme;
+        Expr *var_value = obtain(scope, var_name);
+        if (var_value == NULL)
+        {
+            char *error_message = (char *)malloc(50 + strlen(var_name));
             sprintf(error_message, "Undefined variable '%s'.\n[line %d]\n", var_name, peek()->line);
             *current = -1;
             return create_expr(error_message, ERROR, 70);
         }
         return *var_value;
     }
-    else if (match(LEFT_PAREN)) {
+    else if (match(LEFT_PAREN))
+    {
         Expr exp = expression(scope);
-        if (exp.type == ERROR) return exp;
+        if (exp.type == ERROR)
+            return exp;
         if (match(RIGHT_PAREN))
-        return exp;
-        else {
-            char* error_message = (char* ) malloc(55 + strlen(peek()->lexeme));
+            return exp;
+        else
+        {
+            char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
             sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
             *current = -1;
             return create_expr(error_message, ERROR, 65);
         }
-    } 
-    else {
-        char* error_message = (char* ) malloc(75 + strlen(peek()->lexeme));
+    }
+    else
+    {
+        char *error_message = (char *)malloc(75 + strlen(peek()->lexeme));
         sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
         *current = -1;
         return create_expr(error_message, ERROR, 65);
     }
 }
-
