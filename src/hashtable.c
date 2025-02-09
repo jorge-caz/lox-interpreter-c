@@ -19,7 +19,9 @@ void create_builtin(HashTable *scope, char *name)
 
 Expr create_function(HashTable *scope, char *name, int index, int line)
 {
-    Expr new_function = create_expr(name, FUN, line);
+    char *function_name = (char *)malloc(strlen(name) + 6);
+    sprintf(function_name, "<fn %s>", name);
+    Expr new_function = create_expr(function_name, FUN, line);
     new_function.index = index;
     new_function.scope = scope;
     return new_function;
