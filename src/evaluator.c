@@ -50,6 +50,19 @@ Token *next()
     return &tokenList[(*current) + 1];
 }
 
+void raise_error(int exit_number, const char *message)
+{
+    fprintf(stderr, "%s", message);
+    exit(exit_number);
+}
+
+char *create_error_message(const char *message)
+{
+    char *error_message = (char *)malloc(75 + strlen(peek()->lexeme) + strlen(message));
+    sprintf(error_message, "[line %d] Error at '%s': %s.", peek()->line, peek()->lexeme, message);
+    return error_message;
+}
+
 int is_at_end()
 {
     return (peek()->type == TYPE_EOF && *current >= 0);
@@ -159,9 +172,9 @@ void skip_block()
     {
         while (!is_at_end())
         {
-            skip_declaration();
             if (match(RIGHT_BRACE))
                 return;
+            skip_declaration();
         }
     }
 }
@@ -186,7 +199,7 @@ void skip_forStmt()
             {
                 skip_expression();
                 if (!match(SEMICOLON))
-                    ; // error
+                    raise_error(65, create_error_message("Expect expression"));
             }
             if (match(RIGHT_PAREN))
                 ;
@@ -194,7 +207,7 @@ void skip_forStmt()
             {
                 skip_expression();
                 if (!match(RIGHT_PAREN))
-                    ; // error
+                    raise_error(65, create_error_message("Expect expression"));
             }
             skip_statement();
         }
@@ -209,7 +222,7 @@ void skip_whileStmt()
         {
             skip_expression();
             if (!match(RIGHT_PAREN))
-                ; // error
+                raise_error(65, create_error_message("Expect expression"));
             skip_statement();
         }
     }
@@ -223,7 +236,7 @@ void skip_ifStmt()
         {
             skip_expression();
             if (!match(RIGHT_PAREN))
-                ; // error
+                raise_error(65, create_error_message("Expect expression"));
             skip_statement();
             if (match(ELSE))
                 skip_statement();
@@ -234,8 +247,8 @@ void skip_ifStmt()
 void skip_exprStmt()
 {
     skip_expression();
-    if (match(SEMICOLON))
-        ;
+    if (!match(SEMICOLON))
+        raise_error(65, create_error_message("Expect expression"));
 }
 // printStmt  -> "print" expression ";" ;
 void skip_printStmt()
@@ -244,7 +257,7 @@ void skip_printStmt()
     {
         skip_expression();
         if (!match(SEMICOLON))
-            ; // error
+            raise_error(65, create_error_message("Expect expression"));
     }
 }
 // expression -> assignment ;
@@ -255,13 +268,12 @@ void skip_expression()
 // assignment -> IDENTIFIER "=" assignment | logic_or
 void skip_assignment()
 {
-    if (match(IDENTIFIER))
+    if (is_type(IDENTIFIER) && next_is_type(EQUAL))
     {
-        if (match(EQUAL))
-        {
-            skip_assignment();
-            return;
-        }
+        advance();
+        advance();
+        skip_assignment();
+        return;
     }
     skip_logic_or();
 }
@@ -341,8 +353,9 @@ void skip_primary()
     {
         skip_expression();
         if (!match(RIGHT_PAREN))
-            ; // error
+            raise_error(65, create_error_message("Expect expression"));
     }
+    raise_error(65, create_error_message("Expect expression"));
 }
 
 // program -> declaration* EOF ;
@@ -391,10 +404,8 @@ Expr varDecl(HashTable *scope)
                 return new_variable;
         }
     }
-    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-    sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-    *current = -1;
-    return create_expr(error_message, ERROR, 65);
+    raise_error(65, create_error_message("Expect expression"));
+    return create_expr("nil", NIL, peek()->line);
 }
 // statement -> exprStmt | ifStmt | printStmt | whileStmt | forStmt | block;
 Expr statement(HashTable *scope)
@@ -437,7 +448,7 @@ Expr forStmt(HashTable *scope)
                 {
                     condition = expression(scope);
                     if (!match(SEMICOLON))
-                        ; // error
+                        raise_error(65, create_error_message("Expect expression"));
                 }
 
                 else
@@ -447,7 +458,7 @@ Expr forStmt(HashTable *scope)
                     token_increment = *current;
                     skip_expression();
                     if (!match(RIGHT_PAREN))
-                        ; // error
+                        raise_error(65, create_error_message("Expect expression"));
                 }
                 else
                     token_increment = -1;
@@ -457,7 +468,10 @@ Expr forStmt(HashTable *scope)
                     break;
                 }
                 else
+                {
                     stmt = statement(scope);
+                }
+
                 if (token_increment != -1)
                 {
                     *current = token_increment;
@@ -483,7 +497,7 @@ Expr whileStmt(HashTable *scope)
                 int token_curr = *current;
                 Expr condition = expression(scope);
                 if (!match(RIGHT_PAREN))
-                    ; // error
+                    raise_error(65, create_error_message("Expect expression"));
                 if (condition.type == FALSE || condition.type == NIL)
                 {
                     skip_statement();
@@ -508,7 +522,7 @@ Expr ifStmt(HashTable *scope)
         {
             Expr condition = expression(scope);
             if (!match(RIGHT_PAREN))
-                ; // error
+                raise_error(65, create_error_message("Expect expression"));
             if (condition.type == FALSE || condition.type == NIL)
                 skip_statement();
             else
@@ -517,6 +531,8 @@ Expr ifStmt(HashTable *scope)
             {
                 if (condition.type != FALSE && condition.type != NIL)
                     skip_statement();
+                else
+                    stmt = statement(scope);
             }
         }
     }
@@ -525,24 +541,22 @@ Expr ifStmt(HashTable *scope)
 // block -> "{" declaration* "}"
 Expr block(HashTable *scope)
 {
+    Expr bl = create_expr("nil", NIL, -1);
     if (match(LEFT_BRACE))
     {
         HashTable *newScope = create_scope(scope);
         while (!is_at_end())
         {
-
-            Expr bl = declaration(newScope);
             if (bl.type == ERROR || match(RIGHT_BRACE))
             {
                 destroy_scope(newScope);
                 return bl;
             }
+            bl = declaration(newScope);
         }
     }
-    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-    sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-    *current = -1;
-    return create_expr(error_message, ERROR, 65);
+    raise_error(65, create_error_message("Expect expression"));
+    return create_expr("nil", NIL, -1);
 }
 // exprStmt -> expression ";" ;
 Expr exprStmt(HashTable *scope)
@@ -552,10 +566,7 @@ Expr exprStmt(HashTable *scope)
         return expr;
     if (!match(SEMICOLON))
     {
-        char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-        *current = -1;
-        return create_expr(error_message, ERROR, 65);
+        raise_error(65, create_error_message("Expect expression"));
     }
     return expr;
 }
@@ -569,18 +580,13 @@ Expr printStmt(HashTable *scope)
             return to_print;
         if (!match(SEMICOLON))
         {
-            char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-            sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-            *current = -1;
-            return create_expr(error_message, ERROR, 65);
+            raise_error(65, create_error_message("Expect expression"));
         }
         printf("%s\n", to_print.display);
         return to_print;
     }
-    char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-    sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-    *current = -1;
-    return create_expr(error_message, ERROR, 65);
+    raise_error(65, create_error_message("Expect expression"));
+    return create_expr("nil", NIL, -1);
 }
 // expression -> assignment ;
 Expr expression(HashTable *scope)
@@ -876,17 +882,9 @@ Expr primary(HashTable *scope)
             return exp;
         else
         {
-            char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
-            sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-            *current = -1;
-            return create_expr(error_message, ERROR, 65);
+            raise_error(65, create_error_message("Expect expression"));
         }
     }
-    else
-    {
-        char *error_message = (char *)malloc(75 + strlen(peek()->lexeme));
-        sprintf(error_message, "[line %d] Error at '%s': Expect expression.", peek()->line, peek()->lexeme);
-        *current = -1;
-        return create_expr(error_message, ERROR, 65);
-    }
+    raise_error(65, create_error_message("Expect expression"));
+    return create_expr("nil", NIL, -1);
 }
