@@ -219,7 +219,8 @@ void skip_varDecl(int returnIndex)
         }
     }
 }
-// statement -> exprStmt | ifStmt | printStmt | whileStmt | returnStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | forStmt | returnStmt | block;
+//              exprStmt | ifStmt | printStmt | whileStmt | forStmt | returnStmt | block;
 void skip_statement(int returnIndex)
 {
     if (is_type(PRINT))
@@ -444,19 +445,20 @@ void skip_unary(int returnIndex)
     }
     skip_call(returnIndex);
 }
-// call ::= primary ( "(" expression ( "," expression )* ")" )*
+// call ::= primary ( "(" (expression ( "," expression )*)? ")" )*
 void skip_call(int returnIndex)
 {
     skip_primary(returnIndex);
-    if (match(LEFT_PAREN))
+    while (match(LEFT_PAREN))
     {
-        skip_expression(returnIndex);
-        while (match(COMMA))
+        if (!match(RIGHT_PAREN))
         {
             skip_expression(returnIndex);
+            while (match(COMMA))
+                skip_expression(returnIndex);
+            if (!match(RIGHT_PAREN))
+                ; // error
         }
-        if (!match(RIGHT_PAREN))
-            ; // error
     }
 }
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
@@ -909,8 +911,8 @@ Expr equality(HashTable *scope, int returnIndex)
         }
         else if (last.type == NUMBER && other.type == NUMBER)
         {
-            float expNumber = strtof(last.display, NULL);
-            float otherNumber = strtof(other.display, NULL);
+            double expNumber = strtod(last.display, NULL);
+            double otherNumber = strtod(other.display, NULL);
             val = expNumber == otherNumber;
         }
         else if (last.type == STRING && other.type == STRING)
@@ -947,8 +949,8 @@ Expr comparison(HashTable *scope, int returnIndex)
         }
         if (exp.type == FALSE)
             continue;
-        float expNumber = strtof(last.display, NULL);
-        float otherNumber = strtof(other.display, NULL);
+        double expNumber = strtod(last.display, NULL);
+        double otherNumber = strtod(other.display, NULL);
         last = other;
 
         int val;
@@ -1065,7 +1067,7 @@ Expr unary(HashTable *scope, int returnIndex)
     }
     return call(scope, returnIndex);
 }
-// call ::= primary ( "(" expression ( "," expression )* ")" )*
+// call ::= primary ( "(" (expression ( "," expression )*)? ")" )*
 Expr call(HashTable *scope, int returnIndex)
 {
     Expr exp = primary(scope, returnIndex);
