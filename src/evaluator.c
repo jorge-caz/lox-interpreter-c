@@ -77,140 +77,42 @@ int match(TokenType type)
     return 0;
 }
 
-void code_mover()
+void skip_statement()
 {
-    while (!is_at_end())
-    {
-        block_mover();
-        if (peek()->type == RIGHT_BRACE)
-            return;
-    }
-    return;
-}
-
-// block -> statement | '{' block* '}'
-void block_mover()
-{
-    if (match(LEFT_BRACE))
-    {
-        code_mover();
-        if (match(RIGHT_BRACE))
-            return;
-    }
-    statement_mover();
-    return;
-}
-
-// statement -> expression ';';
-void statement_mover()
-{
-    expression_mover();
-    if (match(SEMICOLON))
+    if (is_at_end())
         return;
-    return;
-}
 
-// expression -> equality
-void expression_mover()
-{
-    equality_mover();
-}
-
-// equality -> comparison (("!=" | "==") comparison)*
-void equality_mover()
-{
-    comparison_mover();
-    while (match(BANG_EQUAL) || match(EQUAL_EQUAL))
+    if (match(IF)) // ifStmt
     {
-        comparison_mover();
-    }
-    return;
-}
-
-// comparison -> term ((">" | ">=" | "<" | "<=") term)*
-void comparison_mover()
-{
-    term_mover();
-    while (match(GREATER) || match(GREATER_EQUAL) || match(LESS) || match(LESS_EQUAL))
-    {
-        term_mover();
-    }
-    return;
-}
-
-// term -> factor (("-" | "+") factor)*
-void term_mover()
-{
-    factor_mover();
-    while (match(MINUS) || match(PLUS))
-    {
-        factor_mover();
-    }
-    return;
-}
-// factor -> unary (("*" | "/") unary)*
-void factor_mover()
-{
-    unary_mover();
-    while (match(STAR) || match(SLASH))
-    {
-        unary_mover();
-    }
-    return;
-}
-
-// unary -> ("!" | "-") unary | primary
-void unary_mover()
-{
-    if (match(BANG) || match(MINUS))
-    {
-        unary_mover();
-        return;
-    }
-    primary_mover();
-    return;
-}
-
-// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
-void primary_mover()
-{
-    if (match(STRING) || match(TRUE) || match(FALSE) ||
-        match(NIL) || match(NUMBER))
-    {
-        return;
-    }
-    else if (match(IDENTIFIER))
-    {
-        if (match(EQUAL))
-            expression_mover();
-        return;
-    }
-    else if (match(PRINT))
-    {
-        expression_mover();
-        return;
-    }
-    else if (match(VAR))
-    {
-        if (match(IDENTIFIER))
+        if (match(LEFT_PAREN))
         {
-            if (match(EQUAL))
-                expression_mover();
-            return;
+            while (!match(RIGHT_PAREN) && !is_at_end())
+                advance();
+        }
+        skip_statement(); // Skip the true branch
+        if (match(ELSE))
+            skip_statement(); // Skip the false branch if exists
+    }
+    else if (match(LEFT_BRACE)) // block
+    {
+        int brace_count = 1;
+        while (brace_count > 0 && !is_at_end())
+        {
+            if (match(LEFT_BRACE))
+                brace_count++;
+            else if (match(RIGHT_BRACE))
+                brace_count--;
+            else
+                advance();
         }
     }
-    else if (match(IF))
+    else
     {
-        expression_mover();
-        block_mover();
+        while (!match(SEMICOLON) && !is_at_end())
+        {
+            advance();
+        }
     }
-    else if (match(LEFT_PAREN))
-    {
-        expression_mover();
-        match(RIGHT_PAREN);
-        return;
-    }
-    return;
 }
 
 // program -> declaration* EOF ;
@@ -291,15 +193,28 @@ Expr statement(HashTable *scope)
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
 Expr ifStmt(HashTable *scope)
 {
+    Expr stmt = create_expr("nil", NIL, -1);
     if (match(IF))
     {
         if (match(LEFT_PAREN))
         {
             Expr condition = expression(scope);
-            if (!match(RIGHT_BRACE))
+            if (!match(RIGHT_PAREN))
                 ; // error
+            if (condition.type == FALSE || condition.type == NIL)
+                skip_statement();
+            else
+                stmt = statement(scope);
+            if (match(ELSE))
+            {
+                if (condition.type != FALSE && condition.type != NIL)
+                    skip_statement();
+            }
+            else
+                stmt = statement(scope);
         }
     }
+    return stmt;
 }
 
 // block -> "{" declaration* "}"
