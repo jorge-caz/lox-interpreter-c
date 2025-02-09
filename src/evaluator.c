@@ -77,43 +77,43 @@ int match(TokenType type)
     return 0;
 }
 
-void skip_statement()
-{
-    if (is_at_end())
-        return;
+// void skip_statement()
+// {
+//     if (is_at_end())
+//         return;
 
-    if (match(IF)) // ifStmt
-    {
-        if (match(LEFT_PAREN))
-        {
-            while (!match(RIGHT_PAREN) && !is_at_end())
-                advance();
-        }
-        skip_statement(); // Skip the true branch
-        if (match(ELSE))
-            skip_statement(); // Skip the false branch if exists
-    }
-    else if (match(LEFT_BRACE)) // block
-    {
-        int brace_count = 1;
-        while (brace_count > 0 && !is_at_end())
-        {
-            if (match(LEFT_BRACE))
-                brace_count++;
-            else if (match(RIGHT_BRACE))
-                brace_count--;
-            else
-                advance();
-        }
-    }
-    else
-    {
-        while (!match(SEMICOLON) && !is_at_end())
-        {
-            advance();
-        }
-    }
-}
+//     if (match(IF)) // ifStmt
+//     {
+//         if (match(LEFT_PAREN))
+//         {
+//             while (!match(RIGHT_PAREN) && !is_at_end())
+//                 advance();
+//         }
+//         skip_statement(); // Skip the true branch
+//         if (match(ELSE))
+//             skip_statement(); // Skip the false branch if exists
+//     }
+//     else if (match(LEFT_BRACE)) // block
+//     {
+//         int brace_count = 1;
+//         while (brace_count > 0 && !is_at_end())
+//         {
+//             if (match(LEFT_BRACE))
+//                 brace_count++;
+//             else if (match(RIGHT_BRACE))
+//                 brace_count--;
+//             else
+//                 advance();
+//         }
+//     }
+//     else
+//     {
+//         while (!match(SEMICOLON) && !is_at_end())
+//         {
+//             advance();
+//         }
+//     }
+// }
 
 // program -> declaration* EOF ;
 // declaration -> varDecl | statement;
@@ -134,6 +134,221 @@ void skip_statement()
 // unary -> ("!" | "-") unary | primary ;
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
 
+// program -> declaration* EOF ;
+void skip_program()
+{
+    while (!is_at_end())
+    {
+        skip_declaration();
+    }
+}
+// declaration -> varDecl | statement;
+void skip_declaration()
+{
+    if (is_type(VAR))
+    {
+        skip_varDecl();
+        return;
+    }
+    skip_statement();
+}
+// varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+void skip_varDecl()
+{
+    if (match(VAR))
+    {
+        if (match(IDENTIFIER))
+        {
+            if (match(EQUAL))
+            {
+                skip_expression();
+            }
+            if (match(SEMICOLON))
+                ;
+        }
+    }
+}
+// statement -> exprStmt | ifStmt | printStmt | block;
+void skip_statement()
+{
+    if (is_type(PRINT))
+    {
+        skip_printStmt();
+        return;
+    }
+    else if (is_type(LEFT_BRACE))
+    {
+        skip_block();
+        return;
+    }
+    else if (is_type(IF))
+    {
+        skip_ifStmt();
+        return;
+    }
+    skip_exprStmt();
+}
+// block -> "{" declaration* "}"
+void skip_block()
+{
+    if (match(LEFT_BRACE))
+    {
+        while (!is_at_end())
+        {
+            skip_declaration();
+            if (match(RIGHT_BRACE))
+                return;
+        }
+    }
+}
+// ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
+void skip_ifStmt()
+{
+    if (match(IF))
+    {
+        if (match(LEFT_PAREN))
+        {
+            skip_expression();
+            if (!match(RIGHT_PAREN))
+                ; // error
+            skip_statement();
+            if (match(ELSE))
+                skip_statement();
+        }
+    }
+}
+
+// exprStmt -> expression ";" ;
+void skip_exprStmt()
+{
+    skip_expression();
+    if (match(SEMICOLON))
+        ;
+}
+
+// printStmt  -> "print" expression ";" ;
+void skip_printStmt()
+{
+    if (match(PRINT))
+    {
+        skip_expression();
+        if (!match(SEMICOLON))
+            ; // error
+    }
+}
+
+// expression -> assignment ;
+void skip_expression()
+{
+    skip_assignment();
+}
+
+// assignment -> IDENTIFIER "=" assignment | logic_or
+void skip_assignment()
+{
+    if (match(IDENTIFIER))
+    {
+        if (match(EQUAL))
+        {
+            skip_assignment();
+            return;
+        }
+    }
+    skip_logic_or();
+}
+
+// logic_or -> logic_and ( "or" logic_and )* ;
+void skip_logic_or()
+{
+    skip_logic_and();
+    while (match(OR))
+    {
+        skip_logic_and();
+    }
+}
+
+// logic_and -> equality ( "and" equality )* ;
+void skip_logic_and()
+{
+    skip_equality();
+    while (match(AND))
+    {
+        skip_equality();
+    }
+}
+
+// equality -> comparison (("!=" | "==") comparison)* ;
+void skip_equality()
+{
+    skip_comparison();
+    while (match(BANG_EQUAL) || match(EQUAL_EQUAL))
+    {
+        skip_comparison();
+    }
+}
+
+// comparison -> term ((">" | ">=" | "<" | "<=") term)* ;
+void skip_comparison()
+{
+    skip_term();
+    while (match(LESS) || match(LESS_EQUAL) || match(GREATER) || match(GREATER_EQUAL))
+    {
+        skip_term();
+    }
+}
+
+// term -> factor (("-" | "+") factor)* ;
+void skip_term()
+{
+    skip_factor();
+    while (match(MINUS) || match(PLUS))
+    {
+        skip_factor();
+    }
+}
+
+// factor -> unary (("*" | "/") unary)* ;
+// unary -> ("!" | "-") unary | primary ;
+// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
+
+// factor -> unary (("*" | "/") unary)* ;
+void skip_factor()
+{
+    skip_unary();
+    while (match(STAR) || match(SLASH))
+    {
+        skip_unary();
+    }
+}
+
+// unary -> ("!" | "-") unary | primary ;
+void skip_unary()
+{
+    if (match(BANG) || match(MINUS))
+    {
+        skip_unary();
+        return;
+    }
+    skip_primary();
+}
+
+// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
+void skip_primary()
+{
+    if (match(STRING) || match(TRUE) || match(FALSE) ||
+        match(NIL) || match(NUMBER) || match(IDENTIFIER))
+    {
+        return;
+    }
+    else if (match(LEFT_PAREN))
+    {
+        skip_expression();
+        if (!match(RIGHT_PAREN))
+            ; // error
+    }
+}
+
+// program -> declaration* EOF ;
 Expr program(HashTable *scope)
 {
     while (!is_at_end())
@@ -154,6 +369,7 @@ Expr declaration(HashTable *scope)
     return statement(scope);
 }
 
+// varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 Expr varDecl(HashTable *scope)
 {
     // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
@@ -285,13 +501,6 @@ Expr printStmt(HashTable *scope)
     return create_expr(error_message, ERROR, 65);
 }
 
-// statement -> exprStmt | printStmt | block;
-// block -> "{" declaration* "}"
-// exprStmt -> expression ";" ;
-// printStmt  -> "print" expression ";" ;
-// expression -> assignment ;
-// assignment -> IDENTIFIER "=" assignment | equality ;
-
 // expression -> assignment ;
 Expr expression(HashTable *scope)
 {
@@ -331,16 +540,6 @@ Expr assignment(HashTable *scope)
     return logic_or(scope);
 }
 
-// assignment -> IDENTIFIER "=" assignment | logic_or
-// logic_or -> logic_and ( "or" logic_and )* ;
-// logic_and -> equality ( "and" equality )* ;
-// equality -> comparison (("!=" | "==") comparison)* ;
-// comparison -> term ((">" | ">=" | "<" | "<=") term)* ;
-// term -> factor (("-" | "+") factor)* ;
-// factor -> unary (("*" | "/") unary)* ;
-// unary -> ("!" | "-") unary | primary ;
-// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
-
 // logic_or -> logic_and ( "or" logic_and )* ;
 Expr logic_or(HashTable *scope)
 {
@@ -355,7 +554,13 @@ Expr logic_or(HashTable *scope)
         if ((exp.type == FALSE || exp.type == NIL) && (other.type == FALSE || other.type == NIL))
             exp = create_expr("false", FALSE, exp.line);
         else if (exp.type == FALSE || exp.type == NIL)
+        {
             exp = other;
+            if (match(OR))
+            {
+                skip_logic_or();
+            }
+        }
     }
     return exp;
 }
@@ -372,7 +577,13 @@ Expr logic_and(HashTable *scope)
             return other;
 
         if ((exp.type == FALSE || exp.type == NIL) || (other.type == FALSE || other.type == NIL))
+        {
             exp = create_expr("false", FALSE, exp.line);
+            if (match(AND))
+            {
+                skip_logic_and();
+            }
+        }
     }
     return exp;
 }
