@@ -163,8 +163,9 @@ void skip_funDecl(int returnIndex)
     if (match(FUN))
     {
         skip_function(returnIndex);
+        return;
     }
-
+    raise_error(65, create_error_message("Expect keyword 'fun'"));
     // error;
 }
 // function ::= IDENTIFIER "(" parameters? ")" block
@@ -178,16 +179,16 @@ void skip_function(int returnIndex)
             {
                 skip_parameters(returnIndex);
                 if (!match(RIGHT_PAREN))
-                    ; // error
+                    raise_error(65, create_error_message("Expect ')' after parameters")); // error
             }
             skip_block(returnIndex);
             return;
         }
         else
-            ; // error
+            raise_error(65, create_error_message("Expect '(' after identifier")); // error
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect an identifier")); // error
 }
 // parameters ::= IDENTIFIER ( "," IDENTIFIER)* ;
 void skip_parameters(int returnIndex)
@@ -197,11 +198,11 @@ void skip_parameters(int returnIndex)
         while (match(COMMA))
         {
             if (!match(IDENTIFIER))
-                ; // error
+                raise_error(65, create_error_message("Expect an identifier after ','")); // error
         }
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect an identifier")); // error
 }
 // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 void skip_varDecl(int returnIndex)
@@ -348,11 +349,11 @@ void skip_returnStmt(int returnIndex)
         {
             skip_expression(returnIndex);
             if (!match(SEMICOLON))
-                ; // error
+                raise_error(65, create_error_message("Expect ';' after expression")); // error
         }
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect a return")); // error
 }
 // printStmt  -> "print" expression ";" ;
 void skip_printStmt(int returnIndex)
@@ -457,7 +458,7 @@ void skip_call(int returnIndex)
             while (match(COMMA))
                 skip_expression(returnIndex);
             if (!match(RIGHT_PAREN))
-                ; // error
+                raise_error(65, create_error_message("Expect ')' after expression")); // error
         }
     }
 }
@@ -510,7 +511,7 @@ Expr declaration(HashTable *scope, int returnIndex)
 Expr funDecl(HashTable *scope, int returnIndex)
 {
     if (!match(FUN))
-        ; // error
+        raise_error(65, create_error_message("Expect keyword 'fun'")); // error
     return function(scope, returnIndex);
 }
 // function ::= IDENTIFIER "(" parameters? ")" block
@@ -523,19 +524,19 @@ Expr function(HashTable *scope, int returnIndex)
         insert(scope, variable_name, new_variable);
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect an identifier"));
     if (match(LEFT_PAREN))
     {
         if (!match(RIGHT_PAREN))
         {
             skip_parameters(returnIndex);
             if (!match(RIGHT_PAREN))
-                ; // error
+                raise_error(65, create_error_message("Expect a ')' after parameters")); // error
         }
         skip_block(returnIndex);
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect parenthesis after identifier")); // error
     return create_expr("nil", NIL, -1);
 }
 // parameters ::= IDENTIFIER ( "," IDENTIFIER)* ;
@@ -614,12 +615,12 @@ Expr returnStmt(HashTable *scope, int returnIndex)
         }
         to_return = expression(scope, returnIndex);
         if (!match(SEMICOLON))
-            ; // error
+            raise_error(65, create_error_message("Expect ';' after an expression")); // error
         *current = returnIndex;
         return to_return;
     }
     else
-        ; // error
+        raise_error(65, create_error_message("Expect a return")); // error
     return to_return;
 }
 // forStmt -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
@@ -991,7 +992,7 @@ Expr term(HashTable *scope, int returnIndex)
         else if (exp.type == STRING && other.type == STRING)
         {
             if (operation.type == MINUS)
-                ; // type error
+                raise_error(70, create_error_message("Can't subtract strings")); // type error
             char *newDisplay = (char *)malloc(strlen(exp.display) + strlen(other.display) + 1);
             sprintf(newDisplay, "%s%s", exp.display, other.display);
             exp = create_expr(newDisplay, STRING, other.line);
@@ -1082,7 +1083,8 @@ Expr call(HashTable *scope, int returnIndex)
                 while (!match(RIGHT_PAREN))
                 {
                     if (token_at(func_position)->type == RIGHT_PAREN)
-                        ; // error! mismatch
+                        raise_error(70, create_error_message("Mismatch of arguments"));
+                    // error! mismatch
                     char *variable_name = token_at(func_position)->lexeme;
                     func_position++;
                     if (token_at(func_position)->type == COMMA)
@@ -1095,13 +1097,13 @@ Expr call(HashTable *scope, int returnIndex)
                     {
                         func_position++;
                         if (!match(RIGHT_PAREN))
-                            ; // error! mismatch
+                            raise_error(70, create_error_message("Mismatch of arguments")); // error! mismatch
                         break;
                     }
                 }
             }
             else if (token_at(func_position)->type != RIGHT_PAREN)
-                ; // error! mismatch
+                raise_error(70, create_error_message("Mismatch of arguments")); // error! mismatch
             else
             {
                 advance();
@@ -1127,12 +1129,12 @@ Expr call(HashTable *scope, int returnIndex)
                 sprintf(disp, "%d", cl);
                 exp = create_expr(disp, NUMBER, peek()->line);
                 if (!match(RIGHT_PAREN))
-                    ; // error
+                    raise_error(65, create_error_message("Expect ')' after function call")); // error
                 return exp;
             }
         }
         else
-            ; // error, not callable
+            raise_error(70, create_error_message("Can only call functions and classes")); // error, not callable
     }
     return exp;
 }
