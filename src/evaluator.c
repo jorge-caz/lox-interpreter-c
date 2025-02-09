@@ -1100,6 +1100,10 @@ Expr call(HashTable *scope, int returnIndex)
                             raise_error(70, create_error_message("Mismatch of arguments")); // error! mismatch
                         break;
                     }
+                    else if (is_type(RIGHT_PAREN))
+                    {
+                        raise_error(70, create_error_message("Mismatch of arguments")); // error! mismatch
+                    }
                 }
             }
             else if (token_at(func_position)->type != RIGHT_PAREN)
