@@ -354,6 +354,8 @@ Expr logic_or(HashTable *scope)
 
         if ((exp.type == FALSE || exp.type == NIL) && (other.type == FALSE || other.type == NIL))
             exp = create_expr("false", FALSE, exp.line);
+        else if (exp.type == FALSE || exp.type == NIL)
+            exp = other;
     }
     return exp;
 }
