@@ -225,15 +225,11 @@ Expr block(HashTable *scope)
         {
 
             Expr bl = declaration(newScope);
-
-            if (match(RIGHT_BRACE))
+            if (bl.type == ERROR || match(RIGHT_BRACE))
             {
                 destroy_scope(newScope);
                 return bl;
             }
-
-            if (bl.type == ERROR)
-                return bl;
         }
     }
     char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
@@ -246,6 +242,8 @@ Expr block(HashTable *scope)
 Expr exprStmt(HashTable *scope)
 {
     Expr expr = expression(scope);
+    if (expr.type == ERROR)
+        return expr;
     if (!match(SEMICOLON))
     {
         char *error_message = (char *)malloc(55 + strlen(peek()->lexeme));
