@@ -584,6 +584,8 @@ Expr logic_and(HashTable *scope)
                 skip_logic_and();
             }
         }
+        else
+            exp = other;
     }
     return exp;
 }
