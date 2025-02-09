@@ -327,15 +327,16 @@ Token *scan_tokens(char *input, int *error)
             if ((int)num == num)
             {
                 char *newStri = (char *)malloc(strlen(stri) + 3);
+                sprintf(newStri, "%f", num);
                 remove_trailing_zeros(newStri);
-                sprintf(newStri, "%f.0", num);
+                sprintf(newStri, "%s.0", newStri);
                 tokens[m] = create_token(NUMBER, newStri, line);
             }
             else
             {
                 char *newStri = (char *)malloc(strlen(stri) + 1);
-                remove_trailing_zeros(newStri);
                 sprintf(newStri, "%f", num);
+                remove_trailing_zeros(newStri);
                 tokens[m] = create_token(NUMBER, newStri, line);
             }
 
