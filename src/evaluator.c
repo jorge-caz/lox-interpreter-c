@@ -80,9 +80,10 @@ int match(TokenType type)
 // program -> declaration* EOF ;
 // declaration -> varDecl | statement;
 // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
-// statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | forStmt | block;
 // block -> "{" declaration* "}"
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
+// forStmt -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 // whileStmt -> "while" "(" expression ")" statement ;
 // exprStmt -> expression ";" ;
 // printStmt  -> "print" expression ";" ;
@@ -165,6 +166,40 @@ void skip_block()
     }
 }
 
+// forStmt -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
+void skip_forStmt()
+{
+    if (match(FOR))
+    {
+        if (match(LEFT_PAREN))
+        {
+            if (match(SEMICOLON))
+                ;
+            else if (is_type(VAR))
+                skip_varDecl();
+            else
+                skip_exprStmt();
+
+            if (match(SEMICOLON))
+                ;
+            else
+            {
+                skip_expression();
+                if (!match(SEMICOLON))
+                    ; // error
+            }
+            if (match(RIGHT_PAREN))
+                ;
+            else
+            {
+                skip_expression();
+                if (!match(RIGHT_PAREN))
+                    ; // error
+            }
+            skip_statement();
+        }
+    }
+}
 // whileStmt -> "while" "(" expression ")" statement ;
 void skip_whileStmt()
 {
@@ -361,7 +396,7 @@ Expr varDecl(HashTable *scope)
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
-// statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | forStmt | block;
 Expr statement(HashTable *scope)
 {
     if (is_type(PRINT))
@@ -372,7 +407,67 @@ Expr statement(HashTable *scope)
         return ifStmt(scope);
     else if (is_type(WHILE))
         return whileStmt(scope);
+    else if (is_type(FOR))
+        return forStmt(scope);
     return exprStmt(scope);
+}
+
+// forStmt -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
+Expr forStmt(HashTable *scope)
+{
+    Expr stmt = create_expr("nil", NIL, -1);
+    if (match(FOR))
+    {
+        if (match(LEFT_PAREN))
+        {
+            Expr condition;
+            int token_condition;
+            int token_increment = -1;
+            if (match(SEMICOLON))
+                ;
+            else if (is_type(VAR))
+                varDecl(scope);
+            else
+                exprStmt(scope);
+
+            while (1)
+            {
+                token_condition = *current;
+                if (!match(SEMICOLON))
+                {
+                    condition = expression(scope);
+                    if (!match(SEMICOLON))
+                        ; // error
+                }
+
+                else
+                    condition = create_expr("true", TRUE, stmt.line);
+                if (!match(RIGHT_PAREN))
+                {
+                    token_increment = *current;
+                    skip_expression();
+                    if (!match(RIGHT_PAREN))
+                        ; // error
+                }
+                else
+                    token_increment = -1;
+                if (condition.type == FALSE || condition.type == NIL)
+                {
+                    skip_statement();
+                    break;
+                }
+                else
+                    stmt = statement(scope);
+                if (token_increment != -1)
+                {
+                    *current = token_increment;
+                    expression(scope);
+                }
+                *current = token_condition;
+            }
+        }
+    }
+    return stmt;
 }
 
 // whileStmt -> "while" "(" expression ")" statement ;
