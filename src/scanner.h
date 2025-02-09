@@ -1,7 +1,8 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
-typedef enum {
+typedef enum
+{
     LEFT_PAREN,
     RIGHT_PAREN,
     LEFT_BRACE,
@@ -41,17 +42,20 @@ typedef enum {
     WHILE,
     SLASH,
     TYPE_EOF,
-    ERROR
+    ERROR,
+    BUILTIN
 } TokenType;
 
-typedef struct {
+typedef struct
+{
     TokenType type;
-    const char* lexeme;
+    const char *lexeme;
     int line;
 } Token;
 
-Token create_token(TokenType type, const char* lexeme, int line);
-Token* scan_tokens(char* input, int* error);
-void tokenize(char* input, int* error);
+void remove_trailing_zeros(char *str);
+Token create_token(TokenType type, const char *lexeme, int line);
+Token *scan_tokens(char *input, int *error);
+void tokenize(char *input, int *error);
 
 #endif
