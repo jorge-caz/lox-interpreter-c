@@ -210,8 +210,6 @@ Expr ifStmt(HashTable *scope)
                 if (condition.type != FALSE && condition.type != NIL)
                     skip_statement();
             }
-            else
-                stmt = statement(scope);
         }
     }
     return stmt;
