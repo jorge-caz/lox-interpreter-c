@@ -77,50 +77,13 @@ int match(TokenType type)
     return 0;
 }
 
-// void skip_statement()
-// {
-//     if (is_at_end())
-//         return;
-
-//     if (match(IF)) // ifStmt
-//     {
-//         if (match(LEFT_PAREN))
-//         {
-//             while (!match(RIGHT_PAREN) && !is_at_end())
-//                 advance();
-//         }
-//         skip_statement(); // Skip the true branch
-//         if (match(ELSE))
-//             skip_statement(); // Skip the false branch if exists
-//     }
-//     else if (match(LEFT_BRACE)) // block
-//     {
-//         int brace_count = 1;
-//         while (brace_count > 0 && !is_at_end())
-//         {
-//             if (match(LEFT_BRACE))
-//                 brace_count++;
-//             else if (match(RIGHT_BRACE))
-//                 brace_count--;
-//             else
-//                 advance();
-//         }
-//     }
-//     else
-//     {
-//         while (!match(SEMICOLON) && !is_at_end())
-//         {
-//             advance();
-//         }
-//     }
-// }
-
 // program -> declaration* EOF ;
 // declaration -> varDecl | statement;
 // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
-// statement -> exprStmt | ifStmt | printStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
 // block -> "{" declaration* "}"
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
+// whileStmt -> "while" "(" expression ")" statement ;
 // exprStmt -> expression ";" ;
 // printStmt  -> "print" expression ";" ;
 // expression -> assignment ;
@@ -168,7 +131,7 @@ void skip_varDecl()
         }
     }
 }
-// statement -> exprStmt | ifStmt | printStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
 void skip_statement()
 {
     if (is_type(PRINT))
@@ -201,6 +164,21 @@ void skip_block()
         }
     }
 }
+
+// whileStmt -> "while" "(" expression ")" statement ;
+void skip_whileStmt()
+{
+    if (match(WHILE))
+    {
+        if (match(LEFT_PAREN))
+        {
+            skip_expression();
+            if (!match(RIGHT_PAREN))
+                ; // error
+            skip_statement();
+        }
+    }
+}
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
 void skip_ifStmt()
 {
@@ -217,7 +195,6 @@ void skip_ifStmt()
         }
     }
 }
-
 // exprStmt -> expression ";" ;
 void skip_exprStmt()
 {
@@ -225,7 +202,6 @@ void skip_exprStmt()
     if (match(SEMICOLON))
         ;
 }
-
 // printStmt  -> "print" expression ";" ;
 void skip_printStmt()
 {
@@ -236,13 +212,11 @@ void skip_printStmt()
             ; // error
     }
 }
-
 // expression -> assignment ;
 void skip_expression()
 {
     skip_assignment();
 }
-
 // assignment -> IDENTIFIER "=" assignment | logic_or
 void skip_assignment()
 {
@@ -256,7 +230,6 @@ void skip_assignment()
     }
     skip_logic_or();
 }
-
 // logic_or -> logic_and ( "or" logic_and )* ;
 void skip_logic_or()
 {
@@ -266,7 +239,6 @@ void skip_logic_or()
         skip_logic_and();
     }
 }
-
 // logic_and -> equality ( "and" equality )* ;
 void skip_logic_and()
 {
@@ -276,7 +248,6 @@ void skip_logic_and()
         skip_equality();
     }
 }
-
 // equality -> comparison (("!=" | "==") comparison)* ;
 void skip_equality()
 {
@@ -286,7 +257,6 @@ void skip_equality()
         skip_comparison();
     }
 }
-
 // comparison -> term ((">" | ">=" | "<" | "<=") term)* ;
 void skip_comparison()
 {
@@ -296,7 +266,6 @@ void skip_comparison()
         skip_term();
     }
 }
-
 // term -> factor (("-" | "+") factor)* ;
 void skip_term()
 {
@@ -306,11 +275,6 @@ void skip_term()
         skip_factor();
     }
 }
-
-// factor -> unary (("*" | "/") unary)* ;
-// unary -> ("!" | "-") unary | primary ;
-// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
-
 // factor -> unary (("*" | "/") unary)* ;
 void skip_factor()
 {
@@ -320,7 +284,6 @@ void skip_factor()
         skip_unary();
     }
 }
-
 // unary -> ("!" | "-") unary | primary ;
 void skip_unary()
 {
@@ -331,7 +294,6 @@ void skip_unary()
     }
     skip_primary();
 }
-
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
 void skip_primary()
 {
@@ -359,7 +321,6 @@ Expr program(HashTable *scope)
     }
     return create_expr("nil", NIL, -1);
 }
-
 // declaration -> varDecl | statement;
 Expr declaration(HashTable *scope)
 {
@@ -368,7 +329,6 @@ Expr declaration(HashTable *scope)
         return varDecl(scope);
     return statement(scope);
 }
-
 // varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
 Expr varDecl(HashTable *scope)
 {
@@ -401,8 +361,7 @@ Expr varDecl(HashTable *scope)
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
-
-// statement -> exprStmt | printStmt | block;
+// statement -> exprStmt | ifStmt | printStmt | whileStmt | block;
 Expr statement(HashTable *scope)
 {
     if (is_type(PRINT))
@@ -411,7 +370,37 @@ Expr statement(HashTable *scope)
         return block(scope);
     else if (is_type(IF))
         return ifStmt(scope);
+    else if (is_type(WHILE))
+        return whileStmt(scope);
     return exprStmt(scope);
+}
+
+// whileStmt -> "while" "(" expression ")" statement ;
+Expr whileStmt(HashTable *scope)
+{
+    Expr stmt = create_expr("nil", NIL, -1);
+    if (match(WHILE))
+    {
+        if (match(LEFT_PAREN))
+        {
+            while (1)
+            {
+                int token_curr = *current;
+                Expr condition = expression(scope);
+                if (!match(RIGHT_PAREN))
+                    ; // error
+                if (condition.type == FALSE || condition.type == NIL)
+                {
+                    skip_statement();
+                    break;
+                }
+                else
+                    stmt = statement(scope);
+                *current = token_curr;
+            }
+        }
+    }
+    return stmt;
 }
 
 // ifStmt -> "if" "(" expression ")" statement ("else" statement) ? ;
@@ -438,7 +427,6 @@ Expr ifStmt(HashTable *scope)
     }
     return stmt;
 }
-
 // block -> "{" declaration* "}"
 Expr block(HashTable *scope)
 {
@@ -461,7 +449,6 @@ Expr block(HashTable *scope)
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
-
 // exprStmt -> expression ";" ;
 Expr exprStmt(HashTable *scope)
 {
@@ -500,13 +487,11 @@ Expr printStmt(HashTable *scope)
     *current = -1;
     return create_expr(error_message, ERROR, 65);
 }
-
 // expression -> assignment ;
 Expr expression(HashTable *scope)
 {
     return assignment(scope);
 }
-
 // assignment -> IDENTIFIER "=" assignment | logic_or ;
 Expr assignment(HashTable *scope)
 {
@@ -539,7 +524,6 @@ Expr assignment(HashTable *scope)
     }
     return logic_or(scope);
 }
-
 // logic_or -> logic_and ( "or" logic_and )* ;
 Expr logic_or(HashTable *scope)
 {
@@ -564,7 +548,6 @@ Expr logic_or(HashTable *scope)
     }
     return exp;
 }
-
 // logic_and -> equality ( "and" equality )* ;
 Expr logic_and(HashTable *scope)
 {
@@ -589,7 +572,6 @@ Expr logic_and(HashTable *scope)
     }
     return exp;
 }
-
 // equality -> comparison (("!=" | "==") comparison)*
 Expr equality(HashTable *scope)
 {
@@ -626,7 +608,6 @@ Expr equality(HashTable *scope)
     }
     return exp;
 }
-
 // comparison -> term ((">" | ">=" | "<" | "<=") term)*
 Expr comparison(HashTable *scope)
 {
@@ -664,7 +645,6 @@ Expr comparison(HashTable *scope)
     }
     return exp;
 }
-
 // term -> factor (("-" | "+") factor)*
 Expr term(HashTable *scope)
 {
@@ -704,7 +684,6 @@ Expr term(HashTable *scope)
     }
     return exp;
 }
-
 // factor -> unary (("*" | "/") unary)*
 Expr factor(HashTable *scope)
 {
@@ -733,7 +712,6 @@ Expr factor(HashTable *scope)
     }
     return exp;
 }
-
 // unary -> ("!" | "-") unary | primary
 Expr unary(HashTable *scope)
 {
@@ -766,7 +744,6 @@ Expr unary(HashTable *scope)
     }
     return primary(scope);
 }
-
 // primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")"
 Expr primary(HashTable *scope)
 {
