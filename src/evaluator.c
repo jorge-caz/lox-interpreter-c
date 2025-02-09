@@ -124,7 +124,15 @@ void skip_statement()
 // exprStmt -> expression ";" ;
 // printStmt  -> "print" expression ";" ;
 // expression -> assignment ;
-// assignment -> IDENTIFIER "=" assignment | equality ;
+// assignment -> IDENTIFIER "=" assignment | logic_or
+// logic_or -> logic_and ( "or" logic_and )* ;
+// logic_and -> equality ( "and" equality )* ;
+// equality -> comparison (("!=" | "==") comparison)* ;
+// comparison -> term ((">" | ">=" | "<" | "<=") term)* ;
+// term -> factor (("-" | "+") factor)* ;
+// factor -> unary (("*" | "/") unary)* ;
+// unary -> ("!" | "-") unary | primary ;
+// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
 
 Expr program(HashTable *scope)
 {
@@ -290,7 +298,7 @@ Expr expression(HashTable *scope)
     return assignment(scope);
 }
 
-// assignment -> IDENTIFIER "=" assignment | equality ;
+// assignment -> IDENTIFIER "=" assignment | logic_or ;
 Expr assignment(HashTable *scope)
 {
     if (is_type(IDENTIFIER) && next_is_type(EQUAL))
@@ -308,7 +316,7 @@ Expr assignment(HashTable *scope)
 
         else if (match(EQUAL))
         {
-            Expr new_value = expression(scope);
+            Expr new_value = assignment(scope);
             if (new_value.type == ERROR)
                 return new_value;
             var_value->display = new_value.display;
@@ -320,7 +328,59 @@ Expr assignment(HashTable *scope)
 
         return (*var_value);
     }
-    return equality(scope);
+    return logic_or(scope);
+}
+
+// assignment -> IDENTIFIER "=" assignment | logic_or
+// logic_or -> logic_and ( "or" logic_and )* ;
+// logic_and -> equality ( "and" equality )* ;
+// equality -> comparison (("!=" | "==") comparison)* ;
+// comparison -> term ((">" | ">=" | "<" | "<=") term)* ;
+// term -> factor (("-" | "+") factor)* ;
+// factor -> unary (("*" | "/") unary)* ;
+// unary -> ("!" | "-") unary | primary ;
+// primary -> NUMBER | STRING | TRUE | FALSE | NIL | "(" expression ")" ;
+
+// logic_or -> logic_and ( "or" logic_and )* ;
+Expr logic_or(HashTable *scope)
+{
+    Expr exp = logic_and(scope);
+    Expr last = exp;
+    while (match(OR))
+    {
+        Token operation = *previous();
+        Expr other = logic_and(scope);
+        if (other.type == ERROR)
+            return other;
+
+        if ((last.type == FALSE || last.type == NIL) && (other.type == FALSE || other.type == NIL))
+            exp = create_expr("false", FALSE, exp.line);
+        else
+            exp = create_expr("true", TRUE, exp.line);
+        last = exp;
+    }
+    return exp;
+}
+
+// logic_and -> equality ( "and" equality )* ;
+Expr logic_and(HashTable *scope)
+{
+    Expr exp = equality(scope);
+    Expr last = exp;
+    while (match(AND))
+    {
+        Token operation = *previous();
+        Expr other = equality(scope);
+        if (other.type == ERROR)
+            return other;
+
+        if ((last.type != FALSE && last.type != NIL) && (other.type != FALSE && other.type != NIL))
+            exp = create_expr("true", TRUE, exp.line);
+        else
+            exp = create_expr("false", FALSE, exp.line);
+        last = exp;
+    }
+    return exp;
 }
 
 // equality -> comparison (("!=" | "==") comparison)*
@@ -333,7 +393,7 @@ Expr equality(HashTable *scope)
         Token operation = *previous();
         Expr other = comparison(scope);
         if (other.type == ERROR)
-            other;
+            return other;
         int val;
         if (last.type != other.type)
         {
@@ -437,6 +497,7 @@ Expr term(HashTable *scope)
     }
     return exp;
 }
+
 // factor -> unary (("*" | "/") unary)*
 Expr factor(HashTable *scope)
 {
@@ -446,7 +507,7 @@ Expr factor(HashTable *scope)
         Token operation = *previous();
         Expr other = unary(scope);
         if (other.type == ERROR)
-            other;
+            return other;
         if (exp.type != NUMBER || other.type != NUMBER)
         {
             char *error_message = (char *)malloc(55);

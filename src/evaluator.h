@@ -62,6 +62,8 @@ Expr printStmt(HashTable *scope);
 Expr ifStmt(HashTable *scope);
 Expr statement(HashTable *scope);
 Expr expression(HashTable *scope);
+Expr logic_or(HashTable *scope);
+Expr logic_and(HashTable *scope);
 Expr equality(HashTable *scope);
 Expr comparison(HashTable *scope);
 Expr term(HashTable *scope);
