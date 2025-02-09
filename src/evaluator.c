@@ -345,7 +345,6 @@ Expr assignment(HashTable *scope)
 Expr logic_or(HashTable *scope)
 {
     Expr exp = logic_and(scope);
-    Expr last = exp;
     while (match(OR))
     {
         Token operation = *previous();
@@ -353,11 +352,8 @@ Expr logic_or(HashTable *scope)
         if (other.type == ERROR)
             return other;
 
-        if ((last.type == FALSE || last.type == NIL) && (other.type == FALSE || other.type == NIL))
+        if ((exp.type == FALSE || exp.type == NIL) && (other.type == FALSE || other.type == NIL))
             exp = create_expr("false", FALSE, exp.line);
-        else
-            exp = create_expr("true", TRUE, exp.line);
-        last = exp;
     }
     return exp;
 }
@@ -366,7 +362,6 @@ Expr logic_or(HashTable *scope)
 Expr logic_and(HashTable *scope)
 {
     Expr exp = equality(scope);
-    Expr last = exp;
     while (match(AND))
     {
         Token operation = *previous();
@@ -374,11 +369,8 @@ Expr logic_and(HashTable *scope)
         if (other.type == ERROR)
             return other;
 
-        if ((last.type != FALSE && last.type != NIL) && (other.type != FALSE && other.type != NIL))
-            exp = create_expr("true", TRUE, exp.line);
-        else
+        if ((exp.type == FALSE || exp.type == NIL) || (other.type == FALSE || other.type == NIL))
             exp = create_expr("false", FALSE, exp.line);
-        last = exp;
     }
     return exp;
 }
