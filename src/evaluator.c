@@ -353,9 +353,14 @@ void skip_primary()
     {
         skip_expression();
         if (!match(RIGHT_PAREN))
+        {
             raise_error(65, create_error_message("Expect expression"));
+        }
     }
-    raise_error(65, create_error_message("Expect expression"));
+    else
+    {
+        raise_error(65, create_error_message("Expect expression"));
+    }
 }
 
 // program -> declaration* EOF ;
